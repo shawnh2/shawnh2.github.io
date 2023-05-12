@@ -7,7 +7,7 @@ layout: article
 
 <!--more-->
 
-![multus-cni-arch](img/2023-05-10/multus-cni-arch.png)
+![multus-cni-arch](https://github.com/shawnh2/shawnh2.github.io/blob/master/_posts/img/2023-05-10/multus-cni-arch.png)
 
 ## CNI 协议能力
 
@@ -278,7 +278,8 @@ annotations:
 
 
 #### 委托调用
-![workflow](img/2023-05-10/multus-cni-workflow.png)
+
+![workflow](https://github.com/shawnh2/shawnh2.github.io/blob/master/_posts/img/2023-05-10/multus-cni-workflow.png)
 
 执行委托调用函数的大致逻辑如下所示，其本质还是调用了 CNI 的 ADD 命令方法，只不过是指明了执行哪个 CNI 插件的 ADD 操作：
 
