@@ -11,11 +11,11 @@ kube-proxy，以下简称 kp，是负责实现 Service VIP 机制（`ExternalNam
 
 kp 的代理模式可由配置文件来指定：[kp 的配置](https://kubernetes.io/docs/reference/config-api/kube-proxy-config.v1alpha1/)通过 ConfigMap 实现，ConfigMap 的配置参数合法性**并不会**被 kp 全部验证，比如宿主机是否禁止使用了 iptables 命令。
 
-<!--more-->
-
 ```bash
 kubectl describe -n kube-system configmaps kube-proxy
 ```
+
+<!--more-->
 
 ### iptables
 
@@ -463,11 +463,12 @@ func (proxier *Proxier) syncProxyRules() {
     // ...
 }
 ```
-更多有关部分同步的技术细节、性能提升表现可查看 KEP-3453（详见参考链接 [6]）报告。
+更多有关部分同步的技术细节、性能提升表现可查看 [KEP-3453](https://github.com/kubernetes/enhancements/blob/master/keps/sig-network/3453-minimize-iptables-restore/README.md)。
+
 ##### 规则分析
 如何构建规则非本文重点。本节将通过查看为不同服务类型创建的 iptables 规则来一览 iptables proxier 的工作内容。这里并不对`ExternalName`类型的 Service 展开，因为正如本文开头所说，它不属于 kp 的工作范畴。
 
-本节描述的所有 iptables 规则均可从`pkg/proxy/iptables/proxier_test.go`中复现。
+本节描述的所有 iptables 规则均可从 [pkg/proxy/iptables/proxier_test.go](https://github.com/kubernetes/kubernetes/blob/release-1.26/pkg/proxy/iptables/proxier_test.go) 中复现。
 
 ###### NodePort
 集群内的所有节点都会配置自身去监听这个 NodePort 端口，在集群外可通过请求集群内任意一个节点的 NodePort 来访问 Service 服务。Service 在创建时，若 NodePort 非显式指定，则 kp 会为其自动分配一个未被占用的 NodePort。
@@ -692,7 +693,8 @@ kp 是 k8s 中为数不多与操作系统内核打交道的组件，承担了许
 ## KEP 2104 与 kpng
 从架构层面来看，kp 的 Service 与 iptables/ipvs 的实现是耦合的，这就造成了扩展 proxier 是一件很困难的操作，使 kp 的可扩展性不强、第三方开发难度较高。
 
-KEP-2104（见参考连接 [9]）提出了一种重构 kp 架构的方案，并已经有了实现雏形：[kpng](https://github.com/kubernetes-sigs/kpng)（Kubernetes Proxy Next Generation）。kpng 将 kp 拆分为两个独立的部分：第一个部分即 frontend，负责连接 apiserver 监视并同步资源，并将资源的业务处理、计算结果通过 gRPC watchable API 提供给外界；第二个部分即 backend，通过 frontend 提供的 gRPC API 获取资源的计算结果，并进行网络的配置。这种架构就很好的将 kp 与 proxier 进行了解耦，backend 不仅可以使用 iptables/ipvs，而且也可以使用 ebpf/nft 等网络技术，所有第三方的实现就只需关注 backend 部分即可，大大增强了 kp 的扩展性。
+[KEP-2104](https://github.com/kubernetes/enhancements/pull/2094) 提出了一种重构 kp 架构的方案，并已经有了实现雏形：[kpng](https://github.com/kubernetes-sigs/kpng)（Kubernetes Proxy Next Generation）。kpng 将 kp 拆分为两个独立的部分：第一个部分即 frontend，负责连接 apiserver 监视并同步资源，并将资源的业务处理、计算结果通过 gRPC watchable API 提供给外界；第二个部分即 backend，通过 frontend 提供的 gRPC API 获取资源的计算结果，并进行网络的配置。这种架构就很好的将 kp 与 proxier 进行了解耦，backend 不仅可以使用 iptables/ipvs，而且也可以使用 ebpf/nft 等网络技术，所有第三方的实现就只需关注 backend 部分即可，大大增强了 kp 的扩展性。
+
 ## Reference
 
 1. [https://cloudyuga.guru/hands_on_lab/k8s-qos-oomkilled](https://cloudyuga.guru/hands_on_lab/k8s-qos-oomkilled)

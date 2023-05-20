@@ -2,7 +2,7 @@
 layout: article
 titles:
   # @start locale config
-  en      : &EN       About
+  en      : &EN
   en-GB   : *EN
   en-US   : *EN
   en-CA   : *EN
@@ -26,7 +26,9 @@ titles:
 key: page-about
 ---
 
-shawn，目前就读于杭州电子科技大学，计算机硕士，研二。
+![cover](https://raw.githubusercontent.com/shawnh2/shawnh2.github.io/master/assets/about-cover.jpeg)
+
+shawn (sh2)，目前就读于杭州电子科技大学，计算机硕士，研二。
 
 ### Working Experience
 
@@ -34,5 +36,4 @@ shawn，目前就读于杭州电子科技大学，计算机硕士，研二。
 
 ### Focus & Interests
 
-- 开源爱好者，擅长 Go、Python
-- 云原生网关和网络代理
+- Cloud Native Gateway and Network Proxy
