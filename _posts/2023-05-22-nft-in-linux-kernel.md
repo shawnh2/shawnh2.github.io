@@ -656,9 +656,9 @@ table ip k8s_svc {
 ### load balancing with nft
 nft 针对负载均衡，引入两个 expr：`nft_numgen`和`nft_hash`，前者负责生成数字，后者则是一致性哈希算法的实现。
 
-![SNAT](https://raw.githubusercontent.com/shawnh2/shawnh2.github.io/master/_posts/img/2023-05-22/nft-lb-snat.png)![DNAT](https://raw.githubusercontent.com/shawnh2/shawnh2.github.io/master/_posts/img/2023-05-22/nft-lb-dnat.png)
+![SNAT](https://raw.githubusercontent.com/shawnh2/shawnh2.github.io/master/_posts/img/2023-05-22/nft-lb-snat.png)
 
-对于一个使用 SNAT 拓扑的 LB，其请求方向的 nft 规则如下所示；LB 会将请求 DNAT 到一个后端，后端则会将响应发送至 LB，再由 LB 转发到客户端。值得注意的是，负载均衡规则中的那些后端地址，可以是硬编码的，即 stateless NAT；相比 stateful NAT，可省去连接追踪的过程。
+对于一个使用 SNAT 拓扑的 LB（如上图所示），其请求方向的 nft 规则如下所示；LB 会将请求 DNAT 到一个后端，后端则会将响应发送至 LB，再由 LB 转发到客户端。值得注意的是，负载均衡规则中的那些后端地址，可以是硬编码的，即 stateless NAT；相比 stateful NAT，可省去连接追踪的过程。
 
 ```bash
 table ip nat {
@@ -676,7 +676,10 @@ table ip nat {
     }
 }
 ```
-对于一个使用 DNAT 拓扑的 LB，其请求方向的 nft 规则如下所示；LB 会将请求 DNAT 到一个后端，后端的响应仍需经过 LB 做源地址伪装后，才能到达客户端。
+
+![DNAT](https://raw.githubusercontent.com/shawnh2/shawnh2.github.io/master/_posts/img/2023-05-22/nft-lb-dnat.png)
+
+对于一个使用 DNAT 拓扑的 LB（如上图所示），其请求方向的 nft 规则如下所示；LB 会将请求 DNAT 到一个后端，后端的响应仍需经过 LB 做源地址伪装后，才能到达客户端。
 ```bash
 table ip nat {
   chain prerouting {
@@ -692,9 +695,10 @@ table ip nat {
   }
 }
 ```
+
 ![DSR](https://raw.githubusercontent.com/shawnh2/shawnh2.github.io/master/_posts/img/2023-05-22/nft-lb-dsr.png)
 
-对于一个使用 DSR 拓扑的 LB，其 nft 规则如下所示；在 LB 网络接口的 ingress hook 处，将目的地址和目的端口为 LB 的请求，置其源二层地址为 LB 的二层地址，目的二层地址为一后端二层地址；对于后端的响应，可直接通过客户端的 IP 地址和 MAC 地址进行返回。
+对于一个使用 DSR 拓扑的 LB（如上图所示），其 nft 规则如下所示；在 LB 网络接口的 ingress hook 处，将目的地址和目的端口为 LB 的请求，置其源二层地址为 LB 的二层地址，目的二层地址为一后端二层地址；对于后端的响应，可直接通过客户端的 IP 地址和 MAC 地址进行返回。
 
 ```bash
 table netdev filter {
