@@ -1,9 +1,9 @@
 ---
-title: kube-proxy 实现原理与代码分析
+title: kube-proxy 实现原理与源码解析
 layout: article
 ---
 
-> 本文代码基于 K8s v1.26.0 展开。
+> 本文代码基于 Kubernetes v1.26.0 展开。
 
 kube-proxy，以下简称 kp，是负责实现 Service VIP 机制（`ExternalName`类型除外）的组件。
 
@@ -14,8 +14,6 @@ kp 的代理模式可由配置文件来指定：[kp 的配置](https://kubernete
 ```bash
 kubectl describe -n kube-system configmaps kube-proxy
 ```
-
-<!--more-->
 
 ### iptables
 
@@ -30,6 +28,8 @@ iptables:
   minSyncPeriod: 1s  # kp 与内核同步 iptables 的时机，默认在 svc 等资源更新后 1s 再同步
   syncPeriod: 30s    # kp 与内核同步 iptables 的周期，默认 30s 同步一次，无论是否有资源更新
 ```
+
+<!--more-->
 
 可见`minSyncPeriod`的值越大，在此期间内的所有更新事件就会聚合，从而进行统一的更新，类似于 Istio 控制面 Pilot 的 debounce 机制；但缺点是会造成规则更新不及时。
 
