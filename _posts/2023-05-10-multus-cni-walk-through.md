@@ -3,7 +3,9 @@ title: Multus CNI 工作原理解析
 layout: article
 ---
 
-[Multus CNI](https://github.com/k8snetworkplumbingwg/multus-cni) 专门负责为 Pod 增加新的网络接口，以接入不同类型的网络，比如 macvlan 等等。而且它的定位是个 Meta CNI，即可代理调用其他 CNI 集群网络插件，因此可以与 calico、flannel 等 CNI 共存。
+> 本文代码基于 [Multus CNI v3.7](https://github.com/k8snetworkplumbingwg/multus-cni/tree/release-3.7) 展开。
+
+Multus CNI 专门负责为 Pod 增加新的网络接口，以接入不同类型的网络，比如 macvlan 等等。而且它的定位是个 Meta CNI，即可代理调用其他 CNI 集群网络插件，因此可以与 calico、flannel 等 CNI 共存。
 
 ![multus-cni-arch](https://raw.githubusercontent.com/shawnh2/shawnh2.github.io/master/_posts/img/2023-05-10/multus-cni-arch.png)
 

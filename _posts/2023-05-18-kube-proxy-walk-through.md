@@ -3,7 +3,7 @@ title: kube-proxy 实现原理与源码解析
 layout: article
 ---
 
-> 本文代码基于 Kubernetes v1.26.0 展开。
+> 本文代码基于 [Kubernetes v1.26](https://github.com/kubernetes/kubernetes/tree/release-1.26) 展开。
 
 kube-proxy，以下简称 kp，是负责实现 Service VIP 机制（`ExternalName`类型除外）的组件。
 
@@ -468,7 +468,7 @@ func (proxier *Proxier) syncProxyRules() {
 ##### 规则分析
 如何构建规则非本文重点。本节将通过查看为不同服务类型创建的 iptables 规则来一览 iptables proxier 的工作内容。这里并不对`ExternalName`类型的 Service 展开，因为正如本文开头所说，它不属于 kp 的工作范畴。
 
-本节描述的所有 iptables 规则均可从 [pkg/proxy/iptables/proxier_test.go](https://github.com/kubernetes/kubernetes/blob/release-1.26/pkg/proxy/iptables/proxier_test.go) 中复现。
+本节描述的所有 iptables 规则均可从 [pkg/proxy/iptables/proxier_test.go](https://github.com/kubernetes/kubernetes/blob/release-1.26/pkg/proxy/iptables/proxier_test.go) 中复现。若无特别说明，Service 的`ExternalTrafficPolicy`默认采用`cluster`模式。
 
 ###### NodePort
 集群内的所有节点都会配置自身去监听这个 NodePort 端口，在集群外可通过请求集群内任意一个节点的 NodePort 来访问 Service 服务。Service 在创建时，若 NodePort 非显式指定，则 kp 会为其自动分配一个未被占用的 NodePort。

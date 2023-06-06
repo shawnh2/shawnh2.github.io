@@ -1,0 +1,46 @@
+<mxfile host="Electron" modified="2023-05-30T09:35:40.318Z" agent="Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/21.2.8 Chrome/112.0.5615.165 Electron/24.2.0 Safari/537.36" etag="kJV1uWYOkA4A63USWXuF" version="21.2.8" type="device">
+  <diagram name="第 1 页" id="Ef42kd39k4j7inr08wV_">
+    <mxGraphModel dx="1114" dy="771" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="OQG2Rp7ZR7DFLMFUeMQe-11" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0;entryY=0;entryDx=40;entryDy=0;entryPerimeter=0;" edge="1" parent="1" source="OQG2Rp7ZR7DFLMFUeMQe-1" target="OQG2Rp7ZR7DFLMFUeMQe-3">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="OQG2Rp7ZR7DFLMFUeMQe-1" value="Service 1" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="120" y="240" width="100" height="180" as="geometry" />
+        </mxCell>
+        <mxCell id="OQG2Rp7ZR7DFLMFUeMQe-10" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0;entryY=0;entryDx=40;entryDy=0;entryPerimeter=0;" edge="1" parent="1" source="OQG2Rp7ZR7DFLMFUeMQe-2" target="OQG2Rp7ZR7DFLMFUeMQe-3">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="OQG2Rp7ZR7DFLMFUeMQe-2" value="Service 2" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="260" y="240" width="100" height="180" as="geometry" />
+        </mxCell>
+        <mxCell id="OQG2Rp7ZR7DFLMFUeMQe-3" value="Pod" style="shape=cube;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;darkOpacity=0.05;darkOpacity2=0.1;size=10;fillColor=#f5f5f5;fontColor=#333333;strokeColor=#666666;" vertex="1" parent="1">
+          <mxGeometry x="200" y="482.5" width="90" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="OQG2Rp7ZR7DFLMFUeMQe-4" value="app: dns" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;" vertex="1" parent="1">
+          <mxGeometry x="270" y="510" width="60" height="25" as="geometry" />
+        </mxCell>
+        <mxCell id="OQG2Rp7ZR7DFLMFUeMQe-5" value="app: dns" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;" vertex="1" parent="1">
+          <mxGeometry x="171" y="390" width="60" height="25" as="geometry" />
+        </mxCell>
+        <mxCell id="OQG2Rp7ZR7DFLMFUeMQe-6" value="app: dns" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;" vertex="1" parent="1">
+          <mxGeometry x="240" y="390" width="60" height="25" as="geometry" />
+        </mxCell>
+        <mxCell id="OQG2Rp7ZR7DFLMFUeMQe-12" value="metallb.universe.tf/allow-shared-ip: &quot;key-to-share-1.2.3.4&quot;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1">
+          <mxGeometry x="90" y="250" width="310" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="OQG2Rp7ZR7DFLMFUeMQe-13" value="loadBalancerIP: 1.2.3.4" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;" vertex="1" parent="1">
+          <mxGeometry x="165" y="280" width="160" height="15" as="geometry" />
+        </mxCell>
+        <mxCell id="OQG2Rp7ZR7DFLMFUeMQe-14" value="TCP Port: 53" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#0050ef;fontColor=#ffffff;strokeColor=#001DBC;" vertex="1" parent="1">
+          <mxGeometry x="70" y="350" width="80" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="OQG2Rp7ZR7DFLMFUeMQe-15" value="UDP Port: 53" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#d80073;fontColor=#ffffff;strokeColor=#A50040;" vertex="1" parent="1">
+          <mxGeometry x="334" y="350" width="80" height="30" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
