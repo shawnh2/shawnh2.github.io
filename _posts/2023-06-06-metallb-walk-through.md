@@ -913,7 +913,7 @@ func (n *ndpResponder) processRequest() dropReason {
 
         // 提取发送者的源 MAC 地址
 	var nsLLAddr net.HardwareAddr
-    for _, o := range ns.Options {
+        for _, o := range ns.Options {
 		lla, ok := o.(*ndp.LinkLayerAddress)
 		if !ok {
 			continue
@@ -977,7 +977,7 @@ func (sl *SpeakerList) UsableSpeakers() map[string]bool {
 
 ![metallb-failover](https://raw.githubusercontent.com/shawnh2/shawnh2.github.io/master/_posts/img/2023-06-06/metallb-failover.png)
 
-可见，在 L2 模式中，性能受限的原因只可能为两个：leader speaker 所在 Node 的带宽瓶颈，以及潜在的慢故障转移。针对后者来说，一次完整且成功的故障转移，需要经过 Leader 选举、广播 GARP、neighbor 更新 ARP 缓存这几个步骤，所以会在几秒内发生（官方指出一般不会超过 10s）。
+可见，在 L2 模式中，性能受限的原因只可能为两个：**leader speaker 所在 Node 的带宽瓶颈，以及潜在的慢故障转移**。针对后者来说，一次完整且成功的故障转移，需要经过 Leader 选举、广播 GARP、neighbor 更新 ARP 缓存这几个步骤，所以会在几秒内发生（官方指出一般不会超过 10s）。
 ### BGP 模式
 该模式下，所有 speaker 都会向每个（或指定的）BGP peer 去广播 Service 的 LB IP。这里所指的 BGP peer 是一类可以使用 BGP 协议的网络路由器，这些路由器包括真实的专业网络路由器，或其他任何运行了路由软件（比如 BIRD、Quagga 等）的设备。当路由器接受到请求 LB IP 的流量时，它会选出一个广播此 IP 的 speaker 所在的 Node，然后将流量转发到该 Node 上。进入到 Node 的流量会通过 kube-proxy 完成后续的转发工作，`ExternalTrafficPolicy`起到的效果与上文描述相同。
 
@@ -1149,7 +1149,7 @@ func (s *session) Set(advs ...*bgp.Advertisement) error {
 ```
 最后的条件变量`cond.Broadcast()`会通过`sendUpdate`或`sendWithdraw`触发 BGP 协议 [UPDATE 消息](https://datatracker.ietf.org/doc/html/rfc1654#section-4.3)（bgp_hdr_type=2）的发送，消息中含有要增加或删除的 LB IP 的路由。
 #### FRR 实现
-MetalLB 除了上述的 Native 方式实现，还支持 FRR 方式的实现。FRR 是个基于 Linux 的强大路由开源软件，它支持各种路由协议，MetalLB 就使用了其 BGP 协议的实现。如果启用 FRR 模式，BGP session 将支持 BFD、支持 ipv6，MetalLB 也会支持各种其他路由协议的实现（比如 RIP、OSPF 等）。
+MetalLB 除了上述的 Native 方式实现，还支持 FRR 方式的实现。[FRR](https://frrouting.org/) 是个基于 Linux 的强大路由开源软件，它支持各种路由协议，MetalLB 就使用了其 BGP 协议的实现。如果启用 FRR 模式，BGP session 将支持 BFD、支持 ipv6，MetalLB 也会支持各种其他路由协议的实现（比如 RIP、OSPF 等）。
 ##### 配合方式
 在实现上，FRR 是作为一个额外的容器出现在 speaker 的 Pod 中。speaker 容器通过写配置文件的方式完成对 FRR 容器的控制，配置文件的内容是 frr session manager 根据 BGP 的配置来编写的（详见`createConfig`方法），生成的配置会写入 manager 的`reloadConfig`通道。通道的另一端是一个负责读取并将配置写入到文件的 goroutine。引发配置写入通道的时机有很多，包括：每次 session 的创建与关闭、以及 session 进行 IP 广播时。所以配置文件的 I/O 读写能力一定程度上成为了 FRR 模式的性能瓶颈，为避免此问题，MetalLB 和 Istio 类似，都**采用了一种 debounce 机制**：即对于一个新配置而言，不立马进行文件写入，而是等待 3s（不可配置），将此段时间内的所有配置“压缩为”一个请求写入到文件。
 ```go
@@ -1194,7 +1194,7 @@ func debouncer(body func(config *frrConfig) error, reload <-chan reloadEvent, re
 ```
 配置文件写入成功后，至此 BGP 的能力（包括负载均衡、故障转移等）就完全交付给了 FRR。有关 FRR 如何实现 BGP 并非本文关注点，感兴趣可[参考此文档](http://docs.frrouting.org/en/latest/bgp.html)。
 ##### 快速故障检测
-开启 FRR 模式的另一个好处就是可以在 BGP session 中使用 BFD 协议。在 Native 实现中，`holdTime`规定了一个失败 session 所存活的时间，该时间越小，故障检测的速度就越快，但这个时间值规定最低为 3s，所以对于一些极其依赖快速检测的场景来说，时间还是太长了。而 BFD 协议提供了一种能双向快速检测故障的方法，可以将故障检测的时长降低至亚秒级。
+开启 FRR 模式的另一个好处就是可以在 BGP session 中使用 BFD 协议。在 Native 实现中，`holdTime`规定了一个失败 session 所存活的时间，该时间越小，故障检测的速度就越快，但这个时间值规定最低为 3s，所以对于一些极其依赖快速检测的场景来说，时间还是太长了。而 BFD 协议提供了一种能双向快速检测故障的方法，可以**将故障检测的时长降低至亚秒级**。
 
 MetalLB 使用了 FRR 提供的 BFD 实现，并提供了一个`BFDProfile` CR，用于暴露 BFD 的配置。当开启 FRR 方式后，bgp controller 除了会触发`syncPeers`进行状态同步，还会调用`syncBFDProfiles`方法将`BFDProfile`翻译为 FRR 配置文件：
 ```go
@@ -1220,7 +1220,7 @@ func (sm *sessionManager) SyncBFDProfiles(profiles map[string]*metallbconfig.BFD
 ## 总结
 MetalLB 的两个组件：controller 和  speaker，都是标准的 K8s controller 实现。其中 controller 组件负责地址分配，对 Service 资源进行 External IP 的分配和回收。个人认为**地址池的多租户模式**和**IP 地址的共享机制**是最能体现 MetalLB 地址管理灵活性的两个点，当然也不否认这对代码复杂度的影响。另外，从 controller 组件中 Allocator 的代码实现上来看，它基本上每个对外方法都是具备幂等性的，这对于需要频繁验证或更新数据的场景来说，是一个很鲁棒、很重要的性质。
 
-外部广播由 speaker 组件负责，其兼顾了二层（ARP 和 NDP）及三层（BGP）协议。很有意思的是，MetalLB 作为一个负载均衡器并没直接实现负载均衡，在 L2 模式中通过故障恢复实现了 LB IP 的高可用，最终负载均衡能力还是有 kube-proxy 承担；在 L3 模式中则是通过 BGP 路由软件的实现来做负载均衡。所以与其说 MetalLB 是一个负载均衡器，不如说 MetalLB 只是充当了各协议间的“粘合剂”。
+外部广播由 speaker 组件负责，其兼顾了二层（ARP 和 NDP）及三层（BGP）协议。很有意思的是，**MetalLB 作为一个负载均衡器并没直接实现负载均衡**，在 L2 模式中通过故障恢复实现了 LB IP 的高可用，最终负载均衡能力还是有 kube-proxy 承担；在 L3 模式中则是通过 BGP 路由软件的实现来做负载均衡。所以与其说 MetalLB 是一个负载均衡器，不如说 MetalLB 只是充当了各协议间的“粘合剂”。
 
 MetalLB 可直接部署在 K8s 裸机集群中。它最初由 Google 团队在 2017 年开发，于 2019 年成为 CNCF Sandbox 项目，但在 2021 年时退出了 CNCF。MetalLB 正如本文解析的那样，本身并无神秘感；最值得探究的，反而是 MetalLB 所使用的这些网络协议，针对此点，本文浅尝辄止。
 ## Reference
