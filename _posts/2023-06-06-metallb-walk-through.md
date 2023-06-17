@@ -5,7 +5,7 @@ layout: article
 
 > 本文代码基于 [MetalLB v0.13.9](https://github.com/metallb/metallb/tree/v0.13.9) 展开。
 
-MetalLB 是一个基于标准路由协议的，用于裸机（bare-metal）k8s 集群的负载均衡器。这里裸机是指，直接部署的 k8s 集群并不能使用 LoadBalancer 类型的 Service，因为它没有提供一种负载均衡器的实现，只有在一些云服务 IaaS 平台（例如 AWS、GKE 等）上才能使用。
+MetalLB 是一个基于标准路由协议的，用于裸机（bare-metal）k8s 集群的负载均衡器。这里裸机是指，直接部署的 k8s 集群并不能使用 LoadBalancer 类型的 Service，因为它没有提供一种负载均衡器的实现，只有在一些云服务 IaaS 平台（例如 AWS、GCP 等）上才能使用。
 
 MetalLB 从两个方面实现了这么一个负载均衡器：**地址分配**（Address Allocation）和**外部广播**（External Announcement）。
 
@@ -1053,7 +1053,7 @@ type SessionManager interface {
 	SyncBFDProfiles(profiles map[string]*config.BFDProfile) error
 }
 ```
-此处调用`NewSession`方法创建的就是一个 **Native 类型的 session**。session 创建的同时，还启动了两个 goroutine，一个负责创建向 BGP peer 的连接，另一个负责在连接建立成功之后定时（通过`BGPPeer.spec.holdTime`配置）向 BGP peer 发送 keepalive 消息。值得注意的是，虽然 speaker 向 BGP peer 建立的是 TCP 连接，但 MetalLB 使用了一种相对底层的方式：**通过 socket 完成**。这样做的原因包括：
+此处调用`NewSession`方法创建的就是一个 **Native 类型的 session**。session 创建的同时，还启动了两个 goroutine，一个负责创建向 BGP peer 的连接，另一个负责在连接建立成功之后定时（通过`BGPPeer.spec.holdTime`配置）向 BGP peer 发送 KEEPALIVE 消息。值得注意的是，虽然 speaker 向 BGP peer 建立的是 TCP 连接，但 MetalLB 使用了一种相对底层的方式：**通过 socket 完成**。这样做的原因包括：
 
 - 方便写入 TCP 的 MD5 签名，`BGPPeer.spec.password`规定了在 BGP session 中使用 TCP MD5 认证
   ```go
@@ -1220,7 +1220,7 @@ func (sm *sessionManager) SyncBFDProfiles(profiles map[string]*metallbconfig.BFD
 ## 总结
 MetalLB 的两个组件：controller 和  speaker，都是标准的 K8s controller 实现。其中 controller 组件负责地址分配，对 Service 资源进行 External IP 的分配和回收。个人认为**地址池的多租户模式**和**IP 地址的共享机制**是最能体现 MetalLB 地址管理灵活性的两个点，当然也不否认这对代码复杂度的影响。另外，从 controller 组件中 Allocator 的代码实现上来看，它基本上每个对外方法都是具备幂等性的，这对于需要频繁验证或更新数据的场景来说，是一个很鲁棒、很重要的性质。
 
-外部广播由 speaker 组件负责，其兼顾了二层（ARP 和 NDP）及三层（BGP）协议。很有意思的是，**MetalLB 作为一个负载均衡器并没直接实现负载均衡**，在 L2 模式中通过故障恢复实现了 LB IP 的高可用，最终负载均衡能力还是有 kube-proxy 承担；在 L3 模式中则是通过 BGP 路由软件的实现来做负载均衡。所以与其说 MetalLB 是一个负载均衡器，不如说 MetalLB 只是充当了各协议间的“粘合剂”。
+外部广播由 speaker 组件负责，其兼顾了二层（ARP 和 NDP）及三层（BGP）协议。很有意思的是，**MetalLB 作为一个负载均衡器并没直接实现负载均衡**，在 L2 模式中通过故障恢复实现了 LB IP 的高可用，最终负载均衡能力还是由 kube-proxy 承担；在 L3 模式中则是通过 BGP 路由软件的实现来做负载均衡。所以与其说 MetalLB 是一个负载均衡器，不如说 MetalLB 只是充当了各协议间的“粘合剂”。
 
 MetalLB 可直接部署在 K8s 裸机集群中。它最初由 Google 团队在 2017 年开发，于 2019 年成为 CNCF Sandbox 项目，但在 2021 年时退出了 CNCF。MetalLB 正如本文解析的那样，本身并无神秘感；最值得探究的，反而是 MetalLB 所使用的这些网络协议，针对此点，本文浅尝辄止。
 ## Reference
