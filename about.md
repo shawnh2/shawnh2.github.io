@@ -32,7 +32,8 @@ shawn (sh2)，目前就读于杭州电子科技大学，计算机硕士，研二
 
 ### Working Experience
 
-- 2023/02-2023/06，上海，七牛云实习
+- 2023/07-now，杭州，Greptime，PaaS Infra Intern
+- 2023/02-2023/06，上海，七牛云，Test Infra Intern
 
 ### Focus & Interests
 

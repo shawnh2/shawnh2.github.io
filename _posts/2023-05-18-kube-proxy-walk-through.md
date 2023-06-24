@@ -1,6 +1,9 @@
 ---
 title: kube-proxy 实现原理与源码解析
 layout: article
+tags:
+- Network
+- Kubernetes
 ---
 
 > 本文代码基于 [Kubernetes v1.26](https://github.com/kubernetes/kubernetes/tree/release-1.26) 展开。

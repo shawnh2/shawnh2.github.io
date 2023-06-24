@@ -1,6 +1,9 @@
 ---
 title: Multus CNI 工作原理解析
 layout: article
+tags:
+- Network
+- CNI
 ---
 
 > 本文代码基于 [Multus CNI v3.7](https://github.com/k8snetworkplumbingwg/multus-cni/tree/release-3.7) 展开。

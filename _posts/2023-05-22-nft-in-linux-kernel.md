@@ -1,6 +1,9 @@
 ---
 title: The NFT in Linux Kernel
 layout: article
+tags:
+- Network
+- Linux Kernel
 ---
 
 > 本文代码基于 [linux kernel v4.10](https://elixir.bootlin.com/linux/v4.10/source) 展开。

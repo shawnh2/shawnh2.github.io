@@ -1,6 +1,8 @@
 ---
 title: MetalLB 工作原理解析
 layout: article
+tags:
+- Network
 ---
 
 > 本文代码基于 [MetalLB v0.13.9](https://github.com/metallb/metallb/tree/v0.13.9) 展开。
