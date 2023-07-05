@@ -6,7 +6,7 @@ tags:
 - Linux Kernel
 ---
 
-> 本文代码基于 [linux kernel v4.10](https://elixir.bootlin.com/linux/v4.10/source) 展开。
+> 本文代码基于 [Linux Kernel v4.10](https://elixir.bootlin.com/linux/v4.10/source) 展开。
 
 nftables（Netfilter Tables，下文简称 nft）是 linux 内核于 v3.13 引入的，意在取代传统的 xtables 工具（比如 iptables、arptables、ebtables 和 ipset 等）。nft 与它们相比，在便捷性、功能和性能上有着巨大的提升。
 
