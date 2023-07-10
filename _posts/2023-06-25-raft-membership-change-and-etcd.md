@@ -1,10 +1,9 @@
 ---
-title: Raft 的成员变更与 Etcd 的实现
+title: Raft 的成员变更与 Etcd 实现
 layout: article
 tags:
 - Distributed System
 ---
-
 
 > 本文配合 [Etcd v3.4](https://github.com/etcd-io/etcd/tree/release-3.4) 的实现来分析 Raft 协议中有关成员变更的内容。
 

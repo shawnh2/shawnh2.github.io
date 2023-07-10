@@ -14,8 +14,6 @@ MetalLB 从两个方面实现了这么一个负载均衡器：**地址分配**�
 ## 地址分配
 类似于各种云厂商的实现，对每个向负载均衡器的请求分配 IP 地址。MetalLB 则负责在裸机集群中分配 IP 地址，这个 IP 地址是从预先配置的地址池（AddressPool）中获取的；同样当 Service 被删除后，MetalLB 也负责回收该地址。
 
-<!--more-->
-
 ### 核心方法
 #### reconcileService
 此方法是 service-controller 的调协方法，位于 MetalLB 的 controller 组件中，负责监听**所有类型**的 Service，然后对它们的 IP 地址进行管理（分配或回收）。
@@ -60,6 +58,9 @@ func (r *ServiceReconciler) reconcileService(ctx context.Context, req ctrl.Reque
 	return ctrl.Result{}, nil
 }
 ```
+
+<!--more-->
+
 Service Controller 调谐所使用的更新数据是一个`ctrl.Request`类型的更新请求，这个更新请求是跟随 MetalLB controller 组件中 manager 的第一个`Watches`方法创建的，此方法监听所有 Service 类型的资源，并提取其所代理 Endpoints 的命名空间和名字，形成一个内容为`NamespacedName`的`ctrl.Request`更新请求。
 ```go
 ctrl.NewControllerManagedBy(mgr).
