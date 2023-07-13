@@ -1,5 +1,5 @@
 ---
-title: The NFT in Linux Kernel
+title: The Nftables in Linux Kernel
 layout: article
 tags:
 - Network

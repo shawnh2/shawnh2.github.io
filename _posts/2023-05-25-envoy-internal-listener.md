@@ -1,5 +1,5 @@
 ---
-title: Envoy 中的 Internal Listener 机制
+title: Envoy 中的 Internal Listener
 layout: article
 tags:
 - Network
