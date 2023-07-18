@@ -73,7 +73,7 @@ func (r *raft) campaign(t CampaignType) {
 		term = r.Term
 	}
 
-        // 对于单节点的集群，成为 candidate 之后可直接成为 leader
+	// 对于单节点的集群，成为 candidate 之后可直接成为 leader
 	if _, _, res := r.poll(r.id, voteRespMsgType(voteMsg), true); res == quorum.VoteWon {
 		if t == campaignPreElection {
 			r.campaign(campaignElection)
@@ -91,7 +91,7 @@ func (r *raft) campaign(t CampaignType) {
 		if t == campaignTransfer {  // 记录投票原因为 leader 转移
 			ctx = []byte(t)
 		}
-                // 向所有其他除了自己之外的 server 发起投票请求
+		// 向所有其他除了自己之外的 server 发起投票请求
 		r.send(pb.Message{Term: term, To: id, Type: voteMsg, Index: r.raftLog.lastIndex(), LogTerm: r.raftLog.lastTerm(), Context: ctx})
 	}
 }
@@ -104,8 +104,7 @@ func (r *raft) Step(m pb.Message) error {
 	// ...
 
 	switch m.Type {
-	// ...
-        // 针对正式投票与预投票消息
+	// ... 针对正式投票与预投票消息
 	case pb.MsgVote, pb.MsgPreVote:
 		// 什么样的情况下才可以进行投票？
 		canVote := r.Vote == m.From ||  // 收到了已票选对象的重复投票请求
@@ -124,7 +123,7 @@ func (r *raft) Step(m pb.Message) error {
 			r.send(pb.Message{To: m.From, Term: r.Term, Type: voteRespMsgType(m.Type), Reject: true})  // 任期不变
 		}
 
-	// ...
+		// ...
 }
 ```
 **但预投票并不能完全解决这个问题**。如下图所示，倘若在 leader S4 复制并提交新配置 entry 之前，S1～S3 接收不到心跳包了，S1 有可能 timeout，并将含有最新任期数的投票请求发给 S4，迫使 S4 沦为 follower。此时，对于 S1 来说，预投票失效，因为它的 log 在集群大多数节点中也为新的。

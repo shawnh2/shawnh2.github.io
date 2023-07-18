@@ -429,19 +429,19 @@ iptables 规则的同步方式分为两种：全量（full）和部分（partial
 然而在实际生产中，kp 其实每次同步发生的变化都不大，但对于一个大集群来说，每更新 1 个 Service 的 iptables rule 就要引发全量地再同步其他 10000 个不变的 iptables rule，这多少有些不值得。所以引入了部分的同步方式。部分同步方式的工作原理也较为简单，就是追踪自上次`iptables-restore`之后，Service 和 EndpointSlice 资源是否发生了变化。若发生了变化，则只针对变化的部分生成 iptables rule，并只更新该 rule 所在的 iptables chain。
 ```go
 func (proxier *Proxier) syncProxyRules() {
-    // ...
+	// ...
 
-    // v1.26 时部分同步作为 kp 的一个 feature，可通过配置启动；v1.27 时默认开启
-    tryPartialSync := !proxier.needFullSync && utilfeature.DefaultFeatureGate.Enabled(features.MinimizeIPTablesRestore)
+	// v1.26 时部分同步作为 kp 的一个 feature，可通过配置启动；v1.27 时默认开启
+	tryPartialSync := !proxier.needFullSync && utilfeature.DefaultFeatureGate.Enabled(features.MinimizeIPTablesRestore)
 	var serviceChanged, endpointsChanged sets.String
 	if tryPartialSync {  // 获取自上次同步后，Service、EndpointSlice 资源所产生的新的变化
 		serviceChanged = proxier.serviceChanges.PendingChanges()
 		endpointsChanged = proxier.endpointsChanges.PendingChanges()
 	}
 
-    // ...
+	// ...
 
-    success := false
+	success := false
 	defer func() {
 		if !success {
 			proxier.syncRunner.RetryAfter(proxier.syncPeriod)
@@ -450,20 +450,20 @@ func (proxier *Proxier) syncProxyRules() {
 		}
 	}()
 
-    // ...
+	// ...
 
-    for svcName, svc := range proxier.svcPortMap {
-        // ...
+	for svcName, svc := range proxier.svcPortMap {
+		// ...
 
-        // 对于没有任何变化的 Service、EndpointSlice 资源则直接跳过同步
-        if tryPartialSync && !serviceChanged.Has(svcName.NamespacedName.String()) && !endpointsChanged.Has(svcName.NamespacedName.String()) {
+		// 对于没有任何变化的 Service、EndpointSlice 资源则直接跳过同步
+		if tryPartialSync && !serviceChanged.Has(svcName.NamespacedName.String()) && !endpointsChanged.Has(svcName.NamespacedName.String()) {
     			continue
 		}
 
-        // ...
-    }
+		// ...
+	}
 
-    // ...
+	// ...
 }
 ```
 更多有关部分同步的技术细节、性能提升表现可查看 [KEP-3453](https://github.com/kubernetes/enhancements/blob/master/keps/sig-network/3453-minimize-iptables-restore/README.md)。

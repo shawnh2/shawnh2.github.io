@@ -24,7 +24,7 @@ func (r *ServiceReconciler) reconcileService(ctx context.Context, req ctrl.Reque
 	// ...
 	var service *v1.Service
 
-        // 根据 Endpoint 提供的 NamespacedName 对象寻找对应的 Service 对象
+	// 根据 Endpoint 提供的 NamespacedName 对象寻找对应的 Service 对象
 	service, err := r.serviceFor(ctx, req.NamespacedName)
 	if err != nil {					\
 		return ctrl.Result{}, err		 \
@@ -36,20 +36,20 @@ func (r *ServiceReconciler) reconcileService(ctx context.Context, req ctrl.Reque
 		return ctrl.Result{}, nil
 	}
 
-        // 根据 Service 获取其所代理的 Endpoints 或 EndpointSlice
+	// 根据 Service 获取其所代理的 Endpoints 或 EndpointSlice
 	epSlices, err := epsOrSlicesForServices(ctx, r, req.NamespacedName, r.Endpoints)
 	if err != nil {
 		return ctrl.Result{}, err
 	}
-        // 此时根据 Service 是否为空，可以判断出此次调谐是对 Service 的删除还是更新
+	// 此时根据 Service 是否为空，可以判断出此次调谐是对 Service 的删除还是更新
 
-        // 对 Service 进行处理，包括 IP 地址的分配和回收
+	// 对 Service 进行处理，包括 IP 地址的分配和回收
 	res := r.Handler(r.Logger, req.NamespacedName.String(), service, epSlices)
 	switch res {
 	case SyncStateError:
 		return ctrl.Result{}, retryError
 	case SyncStateReprocessAll:
-                // 重新进行全量的调谐
+		// 重新进行全量的调谐
 		r.forceReload()
 		return ctrl.Result{}, nil
 	case SyncStateErrorNoRetry:
@@ -105,7 +105,7 @@ func isReloadReq(req ctrl.Request) bool {
 // controller/main.go
 
 func (c *controller) SetBalancer(l log.Logger, name string, svcRo *v1.Service, _ epslices.EpsOrSlices) controllers.SyncState {
-        // 对于空的 Service 即触发回收 IP 操作
+	// 对于空的 Service 即触发回收 IP 操作
 	if svcRo == nil {  // Read only
 		c.deleteBalancer(l, name) --->---
                                                   \
@@ -116,14 +116,14 @@ func (c *controller) SetBalancer(l log.Logger, name string, svcRo *v1.Service, _
 		return controllers.SyncStateReprocessAll
 	}
 
-        // 在分配 IP 地址之前，先确保地址池是配置过的
+	// 在分配 IP 地址之前，先确保地址池是配置过的
 	if c.pools == nil || c.pools.ByName == nil {
 		return controllers.SyncStateSuccess
 	}
 
 	svc := svcRo.DeepCopy()
 	successRes := controllers.SyncStateSuccess
-        // 检查该服务是否被分配过 IP 地址
+	// 检查该服务是否被分配过 IP 地址
 	wasAllocated := c.isServiceAllocated(name) --->---
         // 获取与分配 IP                                    \
 	c.convergeBalancer(l, name, svc)                    \
@@ -131,25 +131,25 @@ func (c *controller) SetBalancer(l log.Logger, name string, svcRo *v1.Service, _
 
         // convergeBalancer 可能会取消对 Service 的 IP 分配，若此种情况发生
 	if wasAllocated && !c.isServiceAllocated(name) {
-                // 被回收的 IP 地址可能还会被其他 LB 类型的 Service 使用，所以再进行全量调谐
+		// 被回收的 IP 地址可能还会被其他 LB 类型的 Service 使用，所以再进行全量调谐
 		successRes = controllers.SyncStateReprocessAll
 	}
 
-        // 对于没有发生任何变化的 Service，则直接返回
+	// 对于没有发生任何变化的 Service，则直接返回
 	if reflect.DeepEqual(svcRo, svc) {
 		return successRes
 	}
 
 	toWrite := svcRo.DeepCopy()
-        // 最后再次与 svcRo 的 Status 字段进行比对，发生变化了则直接进行更新；因为 svc 在 convergeBalancer 中可能会发生变化
+	// 最后再次与 svcRo 的 Status 字段进行比对，发生变化了则直接进行更新；因为 svc 在 convergeBalancer 中可能会发生变化
 	if !reflect.DeepEqual(svcRo.Status, svc.Status) {
 		toWrite.Status = svc.Status
 	}
-        // Annotations 字段也是，发生变化了则直接进行更新
+	// Annotations 字段也是，发生变化了则直接进行更新
 	if !reflect.DeepEqual(svcRo.Annotations, svc.Annotations) {
 		toWrite.Annotations = svc.Annotations
 	}
-        // 只有上述两个字段发生了更新时，才会引发这两者的不同，进而才会进行更新
+	// 只有上述两个字段发生了更新时，才会引发这两者的不同，进而才会进行更新
 	if !reflect.DeepEqual(toWrite, svcRo) {
 		if err := c.client.UpdateStatus(svc); err != nil {
 			return controllers.SyncStateError
@@ -171,7 +171,7 @@ func (c *controller) convergeBalancer(l log.Logger, key string, svc *v1.Service)
 	lbIPs := []net.IP{}
 	var err error
 
-        // 对于非 LoadBalancer 类型的 Service，可提前返回；同时还清除了 Service 的状态信息
+	// 对于非 LoadBalancer 类型的 Service，可提前返回；同时还清除了 Service 的状态信息
 	if svc.Spec.Type != v1.ServiceTypeLoadBalancer {
 		c.clearServiceState(key, svc) --->---
 		return				      \
@@ -189,7 +189,7 @@ func (c *controller) convergeBalancer(l log.Logger, key string, svc *v1.Service)
 		return
 	}
 
-        // ...
+	// ...
 ```
 从上述过程来看，可以很好的诠释：为什么不在`SetBalancer`中就把 LoadBalancer 类型的 Service 筛选出来然后直接对它们进行 IP 分配？因为如果这样做的话，是只考虑了分配过程，而没有考虑回收。若直接对 LoadBalancer 类型的 Service 操作，则对于原来是 LoadBalancer 类型而现在是其他非 LoadBalancer 类型的 Service，它已被分配的 LB IP 就不能被回收，造成地址的无效占用。所以在此方法中进行筛选，并同时清除非 LoadBalancer 类型 Service 的 LB IP，以做到地址的回收。
 
@@ -203,18 +203,18 @@ func (c *controller) convergeBalancer(l log.Logger, key string, svc *v1.Service)
 			lbIPs = append(lbIPs, net.ParseIP(ip))
 		}
 	}
-        // 若 IP 地址为空，或是所有 IP 地址的解析都不正确，则会清除当前 Service 的状态
+	// 若 IP 地址为空，或是所有 IP 地址的解析都不正确，则会清除当前 Service 的状态
 	if len(lbIPs) == 0 {
 		c.clearServiceState(key, svc)
 	} else {
-                // 确定当前 LB IP 的 IP 地址家族
+		// 确定当前 LB IP 的 IP 地址家族
 		lbIPsIPFamily, err := ipfamily.ForAddressesIPs(lbIPs)
 		// 确定 ClusterIP 的 IP 地址家族
 		clusterIPsIPFamily, err := ipfamily.ForService(svc)
 		if err != nil {
 			return
 		}
-                // 若 LB IP 和 ClsuterIP 的 IP 地址家族不一致，则非有效的 IP 地址
+		// 若 LB IP 和 ClsuterIP 的 IP 地址家族不一致，则非有效的 IP 地址
 		if lbIPsIPFamily != clusterIPsIPFamily || lbIPsIPFamily == ipfamily.Unknown {
 			c.clearServiceState(key, svc)
 			lbIPs = []net.IP{}
@@ -230,23 +230,23 @@ func (c *controller) convergeBalancer(l log.Logger, key string, svc *v1.Service)
 // #3
 	// 对于现有的 LB IP，它们可能随着配置的更该而不再适用，所以需要再次进行检查并提供再次分配 LB IP 的机会
 	if len(lbIPs) != 0 {
-                // 地址分配的操作是幂等的，详细说明见下节内容
+		// 地址分配的操作是幂等的，详细说明见下节内容
 		if err = c.ips.Assign(key, svc, lbIPs, k8salloc.Ports(svc), k8salloc.SharingKey(svc), k8salloc.BackendKey(svc)); err != nil {
 			c.clearServiceState(key, svc)
 			lbIPs = []net.IP{}
 		}
-                // 对于地址池 annotation 被修改的情况，意味着需要使用一个新的地址池进行地址分配
+		// 对于地址池 annotation 被修改的情况，意味着需要使用一个新的地址池进行地址分配
 		desiredPool := svc.Annotations[annotationAddressPool]  // => "metallb.universe.tf/address-pool"
 		if len(lbIPs) != 0 && desiredPool != "" && c.ips.Pool(key) != desiredPool {
 			c.clearServiceState(key, svc)
 			lbIPs = []net.IP{}
 		}
-                // 获取期望的 LB IP
+		// 获取期望的 LB IP
 		desiredLbIPs, _, err := getDesiredLbIPs(svc)
 		if err != nil {
 			return
 		}
-                // 若存在期望的 LB IP，且当前 LB IP 与期望的 LB IP 不同，则清空现有状态
+		// 若存在期望的 LB IP，且当前 LB IP 与期望的 LB IP 不同，则清空现有状态
 		if len(desiredLbIPs) > 0 && !isEqualIPs(lbIPs, desiredLbIPs) {
 			c.clearServiceState(key, svc)
 			lbIPs = []net.IP{}
@@ -298,7 +298,7 @@ func (c *controller) convergeBalancer(l log.Logger, key string, svc *v1.Service)
 // controller/service.go
 
 func (c *controller) allocateIPs(key string, svc *v1.Service) ([]net.IP, error) {
-        // 确定 Service 所使用的 IP 地址类型，确定方式见上文
+	// 确定 Service 所使用的 IP 地址类型，确定方式见上文
 	serviceIPFamily, err := ipfamily.ForService(svc)
 	if err != nil {
 		return nil, err
@@ -308,7 +308,7 @@ func (c *controller) allocateIPs(key string, svc *v1.Service) ([]net.IP, error) 
 		return nil, err
 	}
 
-        // 若用户指定了期望 LB IP，则先尝试分配这个 IP
+	// 若用户指定了期望 LB IP，则先尝试分配这个 IP
 	if len(desiredLbIPs) > 0 {
 		if serviceIPFamily != desiredLbIPFamily {
 			return nil, // err
@@ -318,7 +318,7 @@ func (c *controller) allocateIPs(key string, svc *v1.Service) ([]net.IP, error) 
 		}
 		return desiredLbIPs, nil
 	}
-        // 否则，从地址池中分配一个 IP 地址
+	// 否则，从地址池中分配一个 IP 地址
 	desiredPool := svc.Annotations[annotationAddressPool]
 	if desiredPool != "" {
 		ips, err := c.ips.AllocateFromPool(key, svc, serviceIPFamily, desiredPool, k8salloc.Ports(svc), k8salloc.SharingKey(svc), k8salloc.BackendKey(svc))
@@ -328,7 +328,7 @@ func (c *controller) allocateIPs(key string, svc *v1.Service) ([]net.IP, error) 
 		return ips, nil
 	}
 
-        // 若地址池没有被指定，则从所有跟该 Service 相关的地址池中分配
+	// 若地址池没有被指定，则从所有跟该 Service 相关的地址池中分配
 	return c.ips.Allocate(key, svc, serviceIPFamily, k8salloc.Ports(svc), k8salloc.SharingKey(svc), k8salloc.BackendKey(svc))
 }
 ```
@@ -372,15 +372,15 @@ type alloc struct {
 // internal/allocator/allocator.go
 
 func (a *Allocator) Allocate(svcKey string, svc *v1.Service, serviceIPFamily ipfamily.Family, ports []Port, sharingKey, backendKey string) ([]net.IP, error) {
-        // 对于已经被分配地址的 Service，这里再次尝试指定地址
+	// 对于已经被分配地址的 Service，这里再次尝试指定地址
 	if alloc := a.allocated[svcKey]; alloc != nil {
-                // 指定的还是原来已经分配的地址，这里的主要目的是对原地址的合法性再次进行校验；若校验通过，Allocator.allocated 字段虽然会更新，但是内容不变
+		// 指定的还是原来已经分配的地址，这里的主要目的是对原地址的合法性再次进行校验；若校验通过，Allocator.allocated 字段虽然会更新，但是内容不变
 		if err := a.Assign(svcKey, svc, alloc.ips, ports, sharingKey, backendKey); err != nil {
 			return nil, err
 		}
 		return alloc.ips, nil
 	}
-        // 获取 serviceAllocation 中规定的，与当前 Service 各种原数据或命名空间相匹配的地址池，并按照地址池的优先级降序排序
+	// 获取 serviceAllocation 中规定的，与当前 Service 各种原数据或命名空间相匹配的地址池，并按照地址池的优先级降序排序
 	pinnedPools := a.pinnedPoolsForService(svc)
 	for _, pool := range pinnedPools {
                 // 只要从一个地址池中分配 IP 成功，则直接返回该分配的 IP
@@ -388,7 +388,7 @@ func (a *Allocator) Allocate(svcKey string, svc *v1.Service, serviceIPFamily ipf
 			return ips, nil
 		}
 	}
-        // 遍历所有地址池，过滤掉所有非租户的地址池或不会自动分配 IP 的地址池
+	// 遍历所有地址池，过滤掉所有非租户的地址池或不会自动分配 IP 的地址池
 	for _, pool := range a.pools.ByName {
 		if !pool.AutoAssign || pool.ServiceAllocations != nil {
 			continue
@@ -412,10 +412,10 @@ func (a *Allocator) AllocateFromPool(svcKey string, svc *v1.Service, serviceIPFa
 		return alloc.ips, nil
 	}
 
-        // 获取该指定的地址池对象
+	// 获取该指定的地址池对象
 	pool := a.pools.ByName[poolName]
 	ips := []net.IP{}
-        // 根据 IP 地址家族决定分配的地址类型
+	// 根据 IP 地址家族决定分配的地址类型
 	ipfamilySel := make(map[ipfamily.Family]bool)
 	switch serviceIPFamily {
 	case ipfamily.DualStack:
@@ -425,7 +425,7 @@ func (a *Allocator) AllocateFromPool(svcKey string, svc *v1.Service, serviceIPFa
 	}
 
 	for _, cidr := range pool.CIDR {
-                // 地址池的 CIDR 要在和目的 IP 地址类型相同时，才能被分配
+		// 地址池的 CIDR 要在和目的 IP 地址类型相同时，才能被分配
 		cidrIPFamily := ipfamily.ForCIDR(cidr)
 		if _, ok := ipfamilySel[cidrIPFamily]; !ok {
 			continue
@@ -437,7 +437,7 @@ func (a *Allocator) AllocateFromPool(svcKey string, svc *v1.Service, serviceIPFa
 		}
 	}
 
-        // 存在没有被分配的 IP 地址类型，说明地址池已耗尽
+	// 存在没有被分配的 IP 地址类型，说明地址池已耗尽
 	if len(ipfamilySel) > 0 {
 		return nil, // err
 	}
@@ -486,12 +486,12 @@ func (a *Allocator) Assign(svcKey string, svc *v1.Service, ips []net.IP, ports [
 
 func (a *Allocator) checkSharing(svc string, ip string, ports []Port, sk *key) error {
 	if existingSK := a.sharingKeyForIP[ip]; existingSK != nil {
-                // 检查 sharing-key 是否相同
+		// 检查 sharing-key 是否相同
 		if err := sharingOK(existingSK, sk); err != nil {
 			// ...
 		}
 
-                // 检查端口是否被占用，端口由协议和端口号两部分组成
+		// 检查端口是否被占用，端口由协议和端口号两部分组成
 		for _, port := range ports {
 			if curSvc, ok := a.portsInUse[ip][port]; ok && curSvc != svc {
 				return // err
@@ -576,36 +576,36 @@ for _, protocol := range c.protocols {
 // speaker/layer2_controller.go
 
 func (c *layer2Controller) ShouldAnnounce(l log.Logger, name string, toAnnounce []net.IP, pool *config.Pool, svc *v1.Service, eps epslices.EpsOrSlices) string {
-        // 检查 Endpoint 或 EndpointSlice 是否处于 Ready 状态
+	// 检查 Endpoint 或 EndpointSlice 是否处于 Ready 状态
 	if !activeEndpointExists(eps) {
 		return "notOwner"
 	}
 
-        // 检查 speaker 所在 Node 是否匹配地址池中 L2Advertisements 的 NodeSelector
+	// 检查 speaker 所在 Node 是否匹配地址池中 L2Advertisements 的 NodeSelector
 	if !poolMatchesNodeL2(pool, c.myNode) {
 		return "notOwner"
 	}
 
-        // 选出所有匹配地址池中 L2Advertisements NodeSelector 的 speaker Node
+	// 选出所有匹配地址池中 L2Advertisements NodeSelector 的 speaker Node
 	forPool := speakersForPool(c.sList.UsableSpeakers(), pool)  // 当然是从所有有效的 speaker 中选
 	var nodes []string
-        // 根据不同的外部流量策略，选出候选 Node
+	// 根据不同的外部流量策略，选出候选 Node
 	if svc.Spec.ExternalTrafficPolicy == v1.ServiceExternalTrafficPolicyTypeLocal {
-                // 对于 local 类型，只有 Endpoints 出现在的 Node 才可作为候选
+		// 对于 local 类型，只有 Endpoints 出现在的 Node 才可作为候选
 		nodes = usableNodes(eps, forPool)
 	} else {
-                // 对于 cluster 类型，上述所有 Node 都可作为候选
+		// 对于 cluster 类型，上述所有 Node 都可作为候选
 		nodes = nodesWithActiveSpeakers(forPool)
 	}
 	ipString := toAnnounce[0].String()
-        // 根据 node 名 + LB IP 的哈希值对 nodes 进行排序
+	// 根据 node 名 + LB IP 的哈希值对 nodes 进行排序
 	sort.Slice(nodes, func(i, j int) bool {
 		hi := sha256.Sum256([]byte(nodes[i] + "#" + ipString))
 		hj := sha256.Sum256([]byte(nodes[j] + "#" + ipString))
 		return bytes.Compare(hi[:], hj[:]) < 0
 	})
 
-        // 若当前 speaker Node 是排序后 Node 列表中的第一个，则就该由本 speaker 来承担宣告工作
+	// 若当前 speaker Node 是排序后 Node 列表中的第一个，则就该由本 speaker 来承担宣告工作
 	if len(nodes) > 0 && nodes[0] == c.myNode {
 		return ""
 	}
@@ -652,7 +652,7 @@ func (a *Announce) updateInterfaces() {
 
 		// ...
 
-                // 初始化并保存所有接口对应的 Responder
+		//初始化并保存所有接口对应的 Responder
 		if keepARP[ifi.Index] && a.arps[ifi.Index] == nil {
 			resp, err := newARPResponder(a.logger, &ifi, a.shouldAnnounce)
 			a.arps[ifi.Index] = resp
@@ -671,12 +671,12 @@ func (a *Announce) updateInterfaces() {
 // speaker/layer2_controller.go
 
 func (c *layer2Controller) SetBalancer(l log.Logger, name string, lbIPs []net.IP, pool *config.Pool, client service, svc *v1.Service) error {
-        // 获取 Announcer 统计的接口
+	// 获取 Announcer 统计的接口
 	ifs := c.announcer.GetInterfaces()
 	for _, lbIP := range lbIPs {
-                // 获取该 LB IP 对应的 IPAdvertisement，里面记录了规定使用的接口
+		// 获取该 LB IP 对应的 IPAdvertisement，里面记录了规定使用的接口
 		ipAdv := ipAdvertisementFor(lbIP, c.myNode, pool.L2Advertisements)
-                // 对比看两者接口是否匹配
+		// 对比看两者接口是否匹配
 		if !ipAdv.MatchInterfaces(ifs...) {
 			continue
 		}
@@ -688,11 +688,11 @@ func (c *layer2Controller) SetBalancer(l log.Logger, name string, lbIPs []net.IP
 func ipAdvertisementFor(ip net.IP, localNode string, l2Advertisements []*config.L2Advertisement) layer2.IPAdvertisement {
 	ifs := sets.Set[string]{}  // 记录规定使用的接口
 	for _, l2 := range l2Advertisements {
-                // 跳过不属于该 Node 的地址池
+		// 跳过不属于该 Node 的地址池
 		if matchNode := l2.Nodes[localNode]; !matchNode {
 			continue
 		}
-                // 若要使用所有接口，不设置任何配置即可
+		// 若要使用所有接口，不设置任何配置即可
 		if l2.AllInterfaces {
 			return layer2.NewIPAdvertisement(ip, true, sets.Set[string]{})
 		}
@@ -718,13 +718,13 @@ func ipAdvertisementFor(ip net.IP, localNode string, l2Advertisements []*config.
 // internal/layer2/announcer.go
 
 func (a *Announce) SetBalancer(name string, adv IPAdvertisement) {  // name 为 Service name
-        // 向 spamCh 写入数据，触发 spamLoop 发送 ARP 响应
+	// 向 spamCh 写入数据，触发 spamLoop 发送 ARP 响应
 	defer a.doSpam(adv)  --->--- a.spamCh <- adv
 
 	a.Lock()
 	defer a.Unlock()
 
-        // 一个 Service 的 ipAdvertisement 可能会更新很多次，但只处理第一次
+	// 一个 Service 的 ipAdvertisement 可能会更新很多次，但只处理第一次
 	if ipAdvertisements, ok := a.ips[name]; ok {
 		for i := range ipAdvertisements {
 			if adv.ip.Equal(a.ips[name][i].ip) {
@@ -735,10 +735,10 @@ func (a *Announce) SetBalancer(name string, adv IPAdvertisement) {  // name 为 
 	}
 	a.ips[name] = append(a.ips[name], adv)
 
-        // 记录该 IP 的引用次数
+	// 记录该 IP 的引用次数
 	a.ipRefcnt[adv.ip.String()]++
 
-        // ... 执行 defer
+	// ... 执行 defer
 }
 ```
 该泛洪实质上调用`gratuitous`方法，通过使用所有规定接口对应 Responder 的`Gratuitous`方法来进行 ARP/NDP 泛洪。
@@ -748,21 +748,21 @@ func (a *Announce) gratuitous(adv IPAdvertisement) {
 	defer a.RUnlock()
 
 	ip := adv.ip
-        // 若当前 Node 对于 ip 的引用计数为 0，说明该 Node 不是进行广播的
+	// 若当前 Node 对于 ip 的引用计数为 0，说明该 Node 不是进行广播的
 	if a.ipRefcnt[ip.String()] <= 0 {
 		return
 	}
 
 	if ip.To4() != nil {
 		for _, client := range a.arps {
-                        // 只使用与规定接口匹配的 responder 接口
+			// 只使用与规定接口匹配的 responder 接口
 			if !adv.matchInterface(client.intf) {
 				continue
 			}
 			client.Gratuitous(ip)
 		}
 	} else {
-                // 至于 ipv6 类型，处理方式也同上
+		// 至于 ipv6 类型，处理方式也同上
 		for _, client := range a.ndps {
 			if !adv.matchInterface(client.intf) {
 				continue
@@ -788,12 +788,12 @@ func (a *arpResponder) processRequest() dropReason {
 		return dropReasonARPReply
 	}
 
-        // 忽略非广播型并且目的 MAC 地址为当前节点的 ARP 请求
+	// 忽略非广播型并且目的 MAC 地址为当前节点的 ARP 请求
 	if !bytes.Equal(eth.Destination, ethernet.Broadcast) && !bytes.Equal(eth.Destination, a.hardwareAddr) {
 		return dropReasonEthernetDestination
 	}
 
-        // 忽略 Announcer 规定忽略的 ARP 请求
+	// 忽略 Announcer 规定忽略的 ARP 请求
 	reason := a.announce(pkt.TargetIP, a.intf)
 	if reason != dropReasonNone {
 		return reason
@@ -890,7 +890,7 @@ func (n *ndpResponder) Watch(ip net.IP) error {
 }
 
 func (n *ndpResponder) Unwatch(ip net.IP) error {
-        // ...
+	// ...
 	group, err := ndp.SolicitedNodeMulticast(ip)
 
 	n.solicitedNodeGroups[group.String()]--
@@ -908,13 +908,13 @@ func (n *ndpResponder) processRequest() dropReason {
 		return dropReasonError
 	}
 
-        // 只处理 NS 类型的消息
+	// 只处理 NS 类型的消息
 	ns, ok := msg.(*ndp.NeighborSolicitation)
 	if !ok {
 		return dropReasonMessageType
 	}
 
-        // 提取发送者的源 MAC 地址
+	// 提取发送者的源 MAC 地址
 	var nsLLAddr net.HardwareAddr
         for _, o := range ns.Options {
 		lla, ok := o.(*ndp.LinkLayerAddress)
@@ -931,14 +931,14 @@ func (n *ndpResponder) processRequest() dropReason {
 		return dropReasonNoSourceLL
 	}
 
-        // announce 方法与上文 ARP Responder 中的一样
+	// announce 方法与上文 ARP Responder 中的一样
 	reason := n.announce(ns.TargetAddress, n.intf)
 	if reason != dropReasonNone {
 		return reason
 	}
 
 	n.advertise(src, ns.TargetAddress, false)  // 回复 NA 类型的消息，单播地址
-        // ...
+	// ...
 	return dropReasonNone
 }
 ```
@@ -1006,9 +1006,9 @@ func (c *bgpController) syncPeers(l log.Logger) error {
 		needUpdateAds bool
 	)
 
-        // 遍历所有 peers，这些 peers 是当前最新的
+	// 遍历所有 peers，这些 peers 是当前最新的
 	for _, p := range c.peers {
-                // 匹配每个 peer 上的 NodeSeletor，决定该 Node 是否对当前 peer 生效
+		// 匹配每个 peer 上的 NodeSeletor，决定该 Node 是否对当前 peer 生效
 		shouldRun := false
 		if len(p.cfg.NodeSelectors) == 0 {
 			shouldRun = true
@@ -1020,12 +1020,12 @@ func (c *bgpController) syncPeers(l log.Logger) error {
 			}
 		}
 
-                // 若 session 非空但是 Node 已经不生效了，则关闭当前 session
+		// 若 session 非空但是 Node 已经不生效了，则关闭当前 session
 		if p.session != nil && !shouldRun {
 			p.session.Close()  // --->--- conn.Close()
 			p.session = nil
 		} else if p.session == nil && shouldRun {
-                        // 若 session 不存在但是 Node 在生效中，则创建新的 session
+			// 若 session 不存在但是 Node 在生效中，则创建新的 session
 			var routerID net.IP
 			if p.cfg.RouterID != nil {
 				routerID = p.cfg.RouterID
@@ -1040,7 +1040,7 @@ func (c *bgpController) syncPeers(l log.Logger) error {
 		}
 	}
 
-        // 对于有新创建 session 的情况，需要重新发送一次广播
+	// 对于有新创建 session 的情况，需要重新发送一次广播
 	if needUpdateAds {
 		err := c.updateAds()
 	}
@@ -1109,7 +1109,7 @@ func (c *bgpController) updateAds() error {
 		if peer.session == nil {
 			continue
 		}
-                // 针对已建立 session 的 peer 进行 IP 广播
+		// 针对已建立 session 的 peer 进行 IP 广播
 		if err := peer.session.Set(allAds...); err != nil {
 			return err
 		}
@@ -1132,11 +1132,11 @@ func (s *session) Set(advs ...*bgp.Advertisement) error {
 
 	newAdvs := map[string]*bgp.Advertisement{}
 	for _, adv := range advs {
-                // 遍历该 IP 对应的所有 peers，看当前 peer 是否在其中，若在则匹配
+		// 遍历该 IP 对应的所有 peers，看当前 peer 是否在其中，若在则匹配
 		if !adv.MatchesPeer(s.SessionName) {
 			continue
 		}
-                // 目前只能广播 ipv4 类型的 IP 地址
+		// 目前只能广播 ipv4 类型的 IP 地址
 		err := validate(adv)
 		if err != nil {
 			return err

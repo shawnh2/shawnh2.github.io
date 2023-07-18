@@ -442,32 +442,32 @@ next_rule:
 
 		rulenum++;
 
-                // 遍历 rule 中的每一个 expr 并执行
+		// 遍历 rule 中的每一个 expr 并执行
 		nft_rule_for_each_expr(expr, last, rule) {
-			// ...
+		        // ...
 
-                        expr->ops->eval(expr, &regs, pkt);
+		        expr->ops->eval(expr, &regs, pkt);
 
-                        // 若其中有一个 expr 执行失败，则不再继续执行
-			if (regs.verdict.code != NFT_CONTINUE) break;
+		        // 若其中有一个 expr 执行失败，则不再继续执行
+		        if (regs.verdict.code != NFT_CONTINUE) break;
 		}
 
 		switch (regs.verdict.code) {
 		case NFT_BREAK:
-                        // nft 的 chain 允许断点，对于断点仍可继续执行
+		        // nft 的 chain 允许断点，对于断点仍可继续执行
 			regs.verdict.code = NFT_CONTINUE;
 			continue;
 		case NFT_CONTINUE:
-                        // 继续执行
-			// ...
-			continue;
+		        // 继续执行
+		        // ...
+		        continue;
 		}
 
-                // 有 rule 执行失败，则退出 chain
+		// 有 rule 执行失败，则退出 chain
 		break;
 	}
 
-        // 处理 base chain 的 verdict 状态，其状态枚举值与 Netfilter 的一致
+	// 处理 base chain 的 verdict 状态，其状态枚举值与 Netfilter 的一致
 	switch (regs.verdict.code & NF_VERDICT_MASK) {
 	case NF_ACCEPT:
 	case NF_DROP:
@@ -476,17 +476,17 @@ next_rule:
 		return regs.verdict.code;
 	}
 
-        // 处理 regular chain 的 verdict 状态
+	// 处理 regular chain 的 verdict 状态
 	switch (regs.verdict.code) {
 	case NFT_JUMP:
-                // 对于有跳转的 chain，则记录原 chain 到跳转栈
+	        // 对于有跳转的 chain，则记录原 chain 到跳转栈
 		jumpstack[stackptr].chain = chain;
 		jumpstack[stackptr].rule  = rule;
 		jumpstack[stackptr].rulenum = rulenum;
 		stackptr++;
 		/* fall through */
 	case NFT_GOTO:
-                // 并再次执行跳转到的 chain
+	        // 并再次执行跳转到的 chain
 		chain = regs.verdict.chain;
 		goto do_chain;
 	case NFT_CONTINUE:
@@ -496,7 +496,7 @@ next_rule:
 		break;
 	}
 
-        // 若跳转到的 chain 已经执行完了，则再跳回到原来的 chain 继续执行
+	// 若跳转到的 chain 已经执行完了，则再跳回到原来的 chain 继续执行
 	if (stackptr > 0) {
 		stackptr--;
 		chain = jumpstack[stackptr].chain;
@@ -507,7 +507,7 @@ next_rule:
 
 	// ...
 
-        // 当抵达 base chain 的末尾时，根据其 policy 来决定数据包的去留
+	// 当抵达 base chain 的末尾时，根据其 policy 来决定数据包的去留
 	return nft_base_chain(basechain)->policy;
 }
 ```
@@ -523,7 +523,7 @@ static unsigned int nf_route_table_hook(void *priv,
 {
 	// ...
 
-        // 获取数据包信息
+	// 获取数据包信息
 	nft_set_pktinfo_ipv4(&pkt, skb, state);
 
 	mark = skb->mark;
@@ -532,10 +532,10 @@ static unsigned int nf_route_table_hook(void *priv,
 	daddr = iph->daddr;
 	tos = iph->tos;
 
-        // 在执行完 chain 之后，对于 base chain 返回的 verdict 结果
+	// 在执行完 chain 之后，对于 base chain 返回的 verdict 结果
 	ret = nft_do_chain(&pkt, priv);
 	if (ret != NF_DROP && ret != NF_STOLEN) {
-                // 若非丢弃或被窃取，并且 ip header 地址发生了改变，则修改 sk_buff 的路由结果值
+	        // 若非丢弃或被窃取，并且 ip header 地址发生了改变，则修改 sk_buff 的路由结果值
 		iph = ip_hdr(skb);
 		if (iph->saddr != saddr ||
 		    iph->daddr != daddr ||
@@ -564,7 +564,7 @@ nf_nat_ipv4_fn(void *priv, struct sk_buff *skb,
 	// ...
 
 	ct = nf_ct_get(skb, &ctinfo);
-        // 对于没有连接追踪或连接追踪丢失的数据包，不进行 NAT
+	// 对于没有连接追踪或连接追踪丢失的数据包，不进行 NAT
 	if (!ct) return NF_ACCEPT;
 	if (nf_ct_is_untracked(ct)) return NF_ACCEPT;
 
@@ -577,15 +577,15 @@ nf_nat_ipv4_fn(void *priv, struct sk_buff *skb,
 			unsigned int ret;
 			ret = do_chain(priv, skb, state, ct);  // 执行 nft_do_chain
 			if (ret != NF_ACCEPT) return ret;
-                        // ...
+			// ...
 		} else { /* ... */ }
 		break;
 
 	 // ...
-    }
+	 }
 
-        // 对数据包进行 NAT 变换
-	return nf_nat_packet(ct, ctinfo, state->hook, skb);
+	 // 对数据包进行 NAT 变换
+	 return nf_nat_packet(ct, ctinfo, state->hook, skb);
 }
 ```
 ## 应用
