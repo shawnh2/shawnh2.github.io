@@ -163,7 +163,7 @@ func (a *Client) GetConfig(params *GetConfigParams, opts ...ClientOption) (*GetC
 restAPI.DaemonGetConfigHandler = NewGetConfigHandler(d)  // 对应 GET 请求
 restAPI.DaemonPatchConfigHandler = NewPatchConfigHandler(d)
 ```
-cilium-daemon 对于该接口的响应由两部分组成，而最终 **Cilium CNI 关注的**（即`getConfigFromCiliumAgent`函数返回的）**就只有**`**Status**`**部分**。
+cilium-daemon 对于该接口的响应由两部分组成，而最终 **Cilium CNI 关注的**（即`getConfigFromCiliumAgent`函数返回的）**就只有**`Status`**部分**。
 ```go
 type DaemonConfiguration struct {
 	// 描述了 daemon 的可变配置
@@ -860,7 +860,7 @@ func (l *Loader) compileAndLoad(ctx context.Context, ep datapath.Endpoint, dirs 
 ```
 它首先通过`compileDatapath`函数来为 BPF 的 datapath 调用编译器和链接器创建所有的 state 文件，这些**文件的最终编译目标都为 ELF 二进制格式**。编译过程也分为两次程序调用：clang 先生成 LLVM 比特码，llc 再将其编译为字节码。
 
-编译程序的源文件为`bpf_lxc.c`（可见`bpf/bpf_lxc.c`），编译的结果存储在`/var/run/cilium/state/${ID}`之下。
+编译程序的源文件为`bpf_lxc.c`（可见`{cilium}/bpf/bpf_lxc.c`），编译的结果存储在`/var/run/cilium/state/${ID}`之下。
 ```go
 func compileDatapath(ctx context.Context, dirs *directoryInfo, isHost bool, logger *logrus.Entry) error {
 
@@ -902,7 +902,7 @@ func compile(ctx context.Context, prog *progInfo, dir *directoryInfo) (err error
 	return err
 }
 ```
-其次再通过`reloadDatapath`方法来重载 BPF 程序，该方法的核心调用栈如下所示，其主要是将 BPF 程序加载到与 Endpoint 关联的接口上。从`qdisc`等字眼可以看出，该 BPF 程序的加载是通过`tc`（traffic control）来实现的。
+其次再通过`reloadDatapath`方法来重载 BPF 程序，该方法的核心调用栈如下所示，其主要是将 BPF 程序加载到与 Endpoint 关联的网络接口上。该 BPF 程序的加载是通过 linux 内核工具`tc`（traffic control）来实现的。
 ```
 |- Loader.reloadDatapath   @ pkg/datapath/loader/loader.go
    |- replaceDatapath      @ pkg/datapath/loader/netlink.go
@@ -910,7 +910,7 @@ func compile(ctx context.Context, prog *progInfo, dir *directoryInfo) (err error
          |- replaceQdisc
 ```
 ## 删除网络
-相比于 CNI ADD 动作，CNI DEL 动作就相对简单了不少：它负责将在 CNI ADD 中创建的 Endpoint、IP 和网络接口统统移除。
+相比于 CNI ADD 动作，CNI DEL 动作就相对简单了不少：它负责将在 CNI ADD 中创建的 Endpoint、IP 和网络接口统统移除。由于其所涉及的工作方式与 CNI ADD 动作类似，故本节不再展开详细的描述。
 ```go
 func cmdDel(args *skel.CmdArgs) error {
 	n, err := types.LoadNetConf(args.StdinData)
@@ -935,9 +935,10 @@ func cmdDel(args *skel.CmdArgs) error {
 }
 ```
 ## 总结
-本文围绕 cilium-cni 的主要能力展开了简单的分析，cilium-cni 本身并没有难以理解的地方，而 cilium-daemon 作为 CNI 能力的来源，其设计就复杂了许多。本文对于 cilium-daemon 的探究很多时候都是点到为止，尤其是在“Endpoint 创建”相关的章节。因为篇幅原因以及作者水平有限，许多问题都没能深入展开，比如：
+本文围绕 cilium-cni 的主要能力展开了简单的分析，cilium-cni 本身并没有难以理解的地方。相反，cilium-daemon 作为 CNI 能力的来源，其设计就复杂了许多。本文对于 cilium-daemon 的探究很多时候都是点到为止，尤其是在“Endpoint 创建”相关的章节。因为篇幅原因以及作者水平实在有限，许多问题都没能深入展开，比如：
 
-- 为什么 cilium-cni 需要加载 BPF 程序？这个 BPF 程序又提供了哪些网络能力？即`bpf_lxc.c`涉及的网络原理
+- cilium-cni 加载的这个 BPF 程序提供了哪些网络能力？即`bpf_lxc.c`的工作原理
+- BPF 程序加载到网络接口是如何配合 tc 来完成的？具体涉及哪些操作？
 - Endpoint 的 Security identity 发生变化时，其 Network Policy 又是如何变化的？其又是如何计算的？
 
 ## Reference
@@ -946,4 +947,5 @@ func cmdDel(args *skel.CmdArgs) error {
 2. [https://docs.cilium.io/en/stable/network/concepts/ipam/deep_dive/](https://docs.cilium.io/en/stable/network/concepts/ipam/deep_dive/)
 3. [https://docs.cilium.io/en/stable/internals/security-identities/](https://docs.cilium.io/en/stable/internals/security-identities/)
 4. [http://arthurchiao.art/blog/cilium-code-cni-create-network/](http://arthurchiao.art/blog/cilium-code-cni-create-network/)
+5. [https://www.cni.dev/docs/spec/#section-4-plugin-delegation](https://www.cni.dev/docs/spec/#section-4-plugin-delegation)
 
