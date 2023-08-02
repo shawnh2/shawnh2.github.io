@@ -38,3 +38,7 @@ shawn (sh2)，目前就读于杭州电子科技大学，计算机研二。
 ### Focus & Interests
 
 - Cloud Native Gateway and Network Proxy
+
+### Footprints
+
+![china-ex](https://raw.githubusercontent.com/shawnh2/shawnh2.github.io/master/assets/china-ex.png)
