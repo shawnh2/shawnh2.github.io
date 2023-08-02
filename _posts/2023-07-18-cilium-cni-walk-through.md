@@ -844,7 +844,7 @@ func (e *Endpoint) regenerate(ctx *regenerationContext) (retErr error) {
 
 func (l *Loader) CompileAndLoad(ctx context.Context, ep datapath.Endpoint, stats *metrics.SpanStat) error {
 	dirs := directoryInfo{
-		Library: option.Config.BpfDir,     // 默认 bpf 路径为 "/sys/fs/bpf"
+		Library: option.Config.BpfDir,     // /var/lib/cilium/bpf，存放 BPF 模版文件
 		Runtime: option.Config.StateDir,
 		State:   ep.StateDir(),
 		Output:  ep.StateDir(),

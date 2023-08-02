@@ -3,6 +3,7 @@ title: Envoy 中的 Internal Listener
 layout: article
 tags:
 - Network
+- Envoy
 ---
 
 Envoy 支持用户态的 socket，而且在 Enovy 中，用于接受用户态连接的 listener 被称为 internal listener。internal listener 一般用于接受来自 Envoy 内部的连接，例如从 upstream cluster 接受连接请求并建立 TCP 流。使用 internal listener 时，必须将它的 name 作为一个 upstream cluster 的 endpoint 地址。
