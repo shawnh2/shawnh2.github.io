@@ -937,8 +937,8 @@ func cmdDel(args *skel.CmdArgs) error {
 ## 总结
 本文围绕 cilium-cni 的主要能力展开了简单的分析，cilium-cni 本身并没有难以理解的地方。相反，cilium-daemon 作为 CNI 能力的来源，其设计就复杂了许多。本文对于 cilium-daemon 的探究很多时候都是点到为止，尤其是在“Endpoint 创建”相关的章节。因为篇幅原因以及作者水平实在有限，许多问题都没能深入展开，比如：
 
-- cilium-cni 加载的这个 BPF 程序提供了哪些网络能力？即`bpf_lxc.c`的工作原理
-- BPF 程序加载到网络接口是如何配合 tc 来完成的？具体涉及哪些操作？
+- cilium-cni 加载的这个 BPF 程序提供了哪些网络能力？即`bpf_lxc.c`涉及到的网络工作原理
+- ~~BPF 程序加载到网络接口是如何配合 tc 来完成的？具体涉及哪些操作？~~ 详见 [tc ReloadDatapath 博客](https://shawnh2.github.io/2023/08/09/cilium-tc-reload-datapath.html)的分析
 - Endpoint 的 Security identity 发生变化时，其 Network Policy 又是如何变化的？其又是如何计算的？
 
 ## Reference
