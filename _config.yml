@@ -129,7 +129,7 @@ comments:
   gitalk:
     clientID    : d41efcb45f0d49201971 # GitHub Application Client ID
     clientSecret: 45f8b7855606c70f6b18eb71e32e04ddfe411881 # GitHub Application Client Secret
-    repository  : shawnh2.github.io # GitHub repo
+    repository  : blog-comment # GitHub repo
     owner       : shawnh2 # GitHub repo owner
     admin: # GitHub repo owner and collaborators, only these guys can initialize GitHub issues, IT IS A LIST.
       # - your GitHub Id
@@ -206,18 +206,17 @@ defaults:
   ## index
   - scope:
       path: ""
-      # type: posts
+      type: posts
     values:
-      articles:
-        excerpt_type: html
-      # layout: article
-      # sharing: true
-      # license: true
-      # aside:
-      #   toc: true
-      # show_edit_on_github: true
-      # show_subscribe: true
-      # pageview: true
+      layout: article
+      sharing: true
+      license: true
+      category: post
+      aside:
+        toc: true
+      show_edit_on_github: true
+      show_subscribe: true
+      pageview: true
 
 
 ## => Plugins
