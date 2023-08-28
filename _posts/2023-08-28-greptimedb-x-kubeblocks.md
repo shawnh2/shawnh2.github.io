@@ -1,7 +1,7 @@
 ---
 title: "GreptimeDB 的 KubeBlocks 集成经验分享"
 layout: article
-key: blog
+key: greptimedb_x_kb
 tags:
 - Kubernetes
 ---

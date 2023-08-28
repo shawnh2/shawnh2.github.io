@@ -1,7 +1,7 @@
 ---
 title: Cilium CNI 工作原理解析
 layout: article
-key: blog
+key: cilium_cni_x
 tags:
 - Network
 - CNI

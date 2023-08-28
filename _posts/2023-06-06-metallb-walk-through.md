@@ -1,7 +1,7 @@
 ---
 title: MetalLB 工作原理解析
 layout: article
-key: blog
+key: metallb
 tags:
 - Network
 ---

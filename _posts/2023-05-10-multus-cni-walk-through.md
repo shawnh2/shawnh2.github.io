@@ -1,7 +1,7 @@
 ---
 title: Multus CNI 工作原理解析
 layout: article
-key: blog
+key: multus_cni
 tags:
 - Network
 - CNI

@@ -1,7 +1,7 @@
 ---
 title: "Cilium CNI: tc ReloadDatapath 工作原理解析"
 layout: article
-key: blog
+key: cilium_cni_tc
 tags:
 - Network
 - CNI
