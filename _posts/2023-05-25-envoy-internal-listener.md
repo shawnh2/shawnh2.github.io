@@ -1,6 +1,7 @@
 ---
 title: Envoy 中的 Internal Listener
 layout: article
+key: blog
 tags:
 - Network
 - Envoy

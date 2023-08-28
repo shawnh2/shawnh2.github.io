@@ -1,6 +1,7 @@
 ---
-title: The Nftables in Linux Kernel
+title: The nftables in Linux Kernel
 layout: article
+key: blog
 tags:
 - Network
 - Linux Kernel

@@ -1,6 +1,7 @@
 ---
 title: Raft 的成员变更与 Etcd 实现
 layout: article
+key: blog
 tags:
 - Distributed System
 ---

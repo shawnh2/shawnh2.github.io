@@ -1,18 +1,19 @@
 ---
 title: "GreptimeDB 的 KubeBlocks 集成经验分享"
 layout: article
+key: blog
 tags:
 - Kubernetes
 ---
 
 ![kb-banner](https://raw.githubusercontent.com/shawnh2/shawnh2.github.io/master/_posts/img/2023-08-28/kb-banner.png)
 
-<!--more-->
-
 ## 01 KubeBlocks 是什么
 [KubeBlocks](https://github.com/apecloud/kubeblocks) 是一款由 [ApeCloud](https://kubeblocks.io/) 开源的云原生数据基础设施，旨在帮助应用开发者和平台工程师在 Kubernetes 上更好地管理数据库和各种分析型工作负载。KubeBlocks 支持多个云服务商，并且提供了一套声明式、统一的方式来提升 DevOps 效率。
 
 KubeBlocks 目前支持关系型数据库、NoSQL 数据库、向量数据库、时序数据库、图数据库以及流计算系统等多种数据基础设施。
+
+<!--more-->
 
 KubeBlocks 的名字源自 Kubernetes（K8s）和乐高积木（Blocks），致力于让 K8s 上的数据基础设施管理就像搭建乐高积木一样，既高效又有趣。
 

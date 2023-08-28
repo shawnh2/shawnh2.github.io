@@ -1,6 +1,7 @@
 ---
 title: kube-proxy 实现原理与源码解析
 layout: article
+key: blog
 tags:
 - Network
 - Kubernetes
