@@ -1226,7 +1226,8 @@ MetalLB 的两个组件：controller 和  speaker，都是标准的 K8s controll
 
 外部广播由 speaker 组件负责，其兼顾了二层（ARP 和 NDP）及三层（BGP）协议。很有意思的是，**MetalLB 作为一个负载均衡器并没直接实现负载均衡**，在 L2 模式中通过故障恢复实现了 LB IP 的高可用，最终负载均衡能力还是由 kube-proxy 承担；在 L3 模式中则是通过 BGP 路由软件的实现来做负载均衡。所以与其说 MetalLB 是一个负载均衡器，不如说 MetalLB 只是充当了各协议间的“粘合剂”。
 
-MetalLB 可直接部署在 K8s 裸机集群中。它最初由 Google 团队在 2017 年开发，于 2019 年成为 CNCF Sandbox 项目，但在 2021 年时退出了 CNCF。MetalLB 正如本文解析的那样，本身并无神秘感；最值得探究的，反而是 MetalLB 所使用的这些网络协议，针对此点，本文浅尝辄止。
+MetalLB 可直接部署在 K8s 裸机集群中。它最初由 Google 团队在 2017 年开发，于 2021 年[成为 CNCF Sandbox 项目](https://github.com/cncf/toc/issues/720)。MetalLB 正如本文解析的那样，本身并无神秘感；最值得探究的，反而是 MetalLB 所使用的这些网络协议，针对此点，本文浅尝辄止。
+
 ## Reference
 
 1. [https://metallb.universe.tf/](https://metallb.universe.tf/)

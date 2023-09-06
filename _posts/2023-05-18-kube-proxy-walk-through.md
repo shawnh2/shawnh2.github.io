@@ -693,11 +693,12 @@ $ ipvsadm -ln
 
 相比于 iptables，ipvs 在内核中的实现也是基于 netfilter 的 NAT 模式，故在转发层面，理论上没有任何性能提升。但 ipvs 并不需要在宿主机上为每个 Pod 设置 iptables 规则，而是**把规则的处理下沉到了内核态**，从而极大降低维护代价。
 ## 总结
-kp 是 k8s 中为数不多与操作系统内核打交道的组件，承担了许多 k8s 服务网络底层的工作，同时也关系着集群的性能表现。长期以来 kp 在大规模集群的表现一直备受诟病，尽管从 iptables 可以升级到 ipvs，但性能提升并非出类拔萃。社区中也涌现出一批优秀的 kp 替代品，比如名声大噪的 Cilium 等。kp 所做的工作虽然简单，但是涉及的技术并不容易，深挖起来有好多值得研究的地方，本文也只是浅尝辄止。
+kp 是 k8s 中与操作系统网络内核打交道的组件，承担了许多 k8s 服务网络底层的工作，同时也关系着集群的性能表现。长期以来 kp 在大规模集群的表现一直备受诟病，尽管从 iptables 可以升级到 ipvs，但性能提升并非出类拔萃。社区中也涌现出一批优秀的 kp 替代品，比如 Cilium 等。kp 所做的工作虽然简单，但是涉及的技术深挖起来有好多值得研究的地方，本文也只是浅尝辄止。
+
 ## KEP 2104 与 kpng
 从架构层面来看，kp 的 Service 与 iptables/ipvs 的实现是耦合的，这就造成了扩展 proxier 是一件很困难的操作，使 kp 的可扩展性不强、第三方开发难度较高。
 
-[KEP-2104](https://github.com/kubernetes/enhancements/pull/2094) 提出了一种重构 kp 架构的方案，并已经有了实现雏形：[kpng](https://github.com/kubernetes-sigs/kpng)（Kubernetes Proxy Next Generation）。kpng 将 kp 拆分为两个独立的部分：第一个部分即 frontend，负责连接 apiserver 监视并同步资源，并将资源的业务处理、计算结果通过 gRPC watchable API 提供给外界；第二个部分即 backend，通过 frontend 提供的 gRPC API 获取资源的计算结果，并进行网络的配置。这种架构就很好的将 kp 与 proxier 进行了解耦，backend 不仅可以使用 iptables/ipvs，而且也可以使用 ebpf/nft 等网络技术，所有第三方的实现就只需关注 backend 部分即可，大大增强了 kp 的扩展性。
+[KEP-2104](https://github.com/kubernetes/enhancements/pull/2094) 提出了一种重构 kp 架构的方案，并已经有了实现雏形：[kpng](https://github.com/kubernetes-sigs/kpng)（Kubernetes Proxy Next Generation）。kpng 将 kp 拆分为两个独立的部分：第一个部分即 frontend，负责连接 apiserver 监视并同步资源，并将资源的业务处理、计算结果通过 gRPC watchable API 提供给外界；第二个部分即 backend，通过 frontend 提供的 gRPC API 获取资源的计算结果，并进行网络的配置。这种架构就很好的将 kp 与 proxier 进行了解耦，backend 不仅可以使用 iptables/ipvs，而且也可以使用 ebpf/nftables 等网络技术，所有第三方的实现就只需关注 backend 部分即可，大大增强了 kp 的扩展性。
 
 ## Reference
 
