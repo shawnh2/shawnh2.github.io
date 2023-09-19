@@ -553,7 +553,7 @@ for _, protocol := range c.protocols {
 }
 ```
 ### Layer2 模式
-在 L2 模式中，由一个 Node 上的 speaker 组件（DaemonSet）负责宣告 Service 在一个子网中的 External IP 地址（leader speaker），即该 IP 地址会出现在其 Node 的网络接口上，作为外界访问服务的流量入口。所有对 Service External IP 的流量都会被路由到一个 Node 上，当流量进入 Node 后，[kube-proxy 会负责将流量分发到 Service 代理的不同 Pod 上](https://shawnh2.github.io/2023/05/18/kube-proxy-walk-through.html#loadbalancer)。因为所有流量都只通过一个 Node 进入，所以严格意义上讲，MetalLB 并没有在 L2 模式中实现负载均衡器。相反，而是实现了一套**故障转移**或**高可用机制**，即当一个 speaker 不可用时，会有其他 Node 上的 speaker 接管宣告 Service External IP 的工作。
+在 L2 模式中，由一个 Node 上的 speaker 组件（DaemonSet）负责宣告 Service 在一个子网中的 External IP 地址（leader speaker），即该 IP 地址会出现在其 Node 的网络接口上，作为外界访问服务的流量入口。所有对 Service External IP 的流量都会被路由到一个 Node 上，当流量进入 Node 后，[kube-proxy 会负责将流量分发到 Service 代理的不同 Pod 上](https://shawnh2.github.io/post/2023/05/18/kube-proxy-walk-through.html#loadbalancer)。因为所有流量都只通过一个 Node 进入，所以严格意义上讲，MetalLB 并没有在 L2 模式中实现负载均衡器。相反，而是实现了一套**故障转移**或**高可用机制**，即当一个 speaker 不可用时，会有其他 Node 上的 speaker 接管宣告 Service External IP 的工作。
 
 由于一个集群中可能会出现多个地址池，即多个子网，故针对每个子网，都会实施故障转移机制。如下图所示，Node A 和 B 属于同一个子网 A，那么 Node A 和 B 其中一个会被选为子网 A 的 leader speaker；而对于 Node C 来说，由于只有一个 Node 属于子网 B，故 Node C 会一直作为该子网的 leader speaker。
 

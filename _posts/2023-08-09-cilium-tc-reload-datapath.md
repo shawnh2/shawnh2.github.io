@@ -10,7 +10,7 @@ tags:
 
 > 本文代码基于 Cilium HEAD [4093531](https://github.com/cilium/cilium/commit/40935318e344424be1ea96510c96427aef5134c3) 展开。
 
-在 Cilium CNI 中，每当 CiliumEndpoint 被创建时，都会触发`Loader.CompileAndLoad`方法的执行。在[之前的文章中](https://shawnh2.github.io/2023/07/18/cilium-cni-walk-through.html#compileandload)提到过，Cilium 使用`tc`（traffic control）来将编译好的 BPF 程序加载到内核，但针对具体加载过程、加载内容并没有展开描述，因此本文借机来一探究竟。
+在 Cilium CNI 中，每当 CiliumEndpoint 被创建时，都会触发`Loader.CompileAndLoad`方法的执行。在[之前的文章中](https://shawnh2.github.io/post/2023/07/18/cilium-cni-walk-through.html#compileandload)提到过，Cilium 使用`tc`（traffic control）来将编译好的 BPF 程序加载到内核，但针对具体加载过程、加载内容并没有展开描述，因此本文借机来一探究竟。
 ```go
 // pkg/datapath/loader/loader.go
 
@@ -123,7 +123,7 @@ host endpoint 是一种特殊的 endpoint，可以将其认为是从 localhost �
   },
 # ...
 ```
-实际上，`cilium_host`接口对应的 ip 地址就是 [Cilium Internal IP](https://shawnh2.github.io/2023/07/18/cilium-cni-walk-through.html#cilium-internal-ip)：
+实际上，`cilium_host`接口对应的 ip 地址就是 [Cilium Internal IP](https://shawnh2.github.io/post/2023/07/18/cilium-cni-walk-through.html#cilium-internal-ip)：
 ```bash
 ~ ip addr
 # ...
@@ -140,7 +140,7 @@ kind-worker          10.244.2.110       172.19.0.4   17h
 
 - `cilium_vxlan`，负责对数据包在 vxlan 中的解、封装操作
 - `cilium_host`和`cilium_net`，它们实质上是一对 veth-pair
-   - `cilium_host`用作节点所在集群子网的网关，因为在 [endpoint 生成的路由](https://shawnh2.github.io/2023/07/18/cilium-cni-walk-through.html#endpoint-%E8%B7%AF%E7%94%B1%E7%94%9F%E6%88%90)中，Cilium Internal IP 充当了 endpoint 的默认网关
+   - `cilium_host`用作节点所在集群子网的网关，因为在 [endpoint 生成的路由](https://shawnh2.github.io/post/2023/07/18/cilium-cni-walk-through.html#endpoint-%E8%B7%AF%E7%94%B1%E7%94%9F%E6%88%90)中，Cilium Internal IP 充当了 endpoint 的默认网关
 - `lxc_health`，负责 endpoint 间的健康检查
 
 ### reloadHostDatapath
@@ -474,7 +474,7 @@ static __always_inline int __tail_handle_ipv4(struct __ctx_buff *ctx,
 #endif /* ENABLE_PER_PACKET_LB */
 }
 ```
-另外值得注意的一个点就是，`is_valid_lxc_src_ipv4`是如何验证源 IP 地址是否有效的？此函数是通过比较数据包的源地址与`LXC_IPV4`宏的值来验证的。`LXC_IPV4`这个宏是在 tc ReloadDatapath 之前，通过 [regenerate 方法](https://shawnh2.github.io/2023/07/18/cilium-cni-walk-through.html#regenerate)写入到`/var/run/cilium/state/${endpoint-id}/ep_config.h`中的。
+另外值得注意的一个点就是，`is_valid_lxc_src_ipv4`是如何验证源 IP 地址是否有效的？此函数是通过比较数据包的源地址与`LXC_IPV4`宏的值来验证的。`LXC_IPV4`这个宏是在 tc ReloadDatapath 之前，通过 [regenerate 方法](https://shawnh2.github.io/post/2023/07/18/cilium-cni-walk-through.html#regenerate)写入到`/var/run/cilium/state/${endpoint-id}/ep_config.h`中的。
 ```bash
 ~ cat /var/run/cilium/state/1332/ep_config.h | grep IP
  * IPv4 address: 10.244.2.149
@@ -506,14 +506,14 @@ func (d *Daemon) createEndpoint(ctx context.Context, owner regeneration.Owner, e
 
 ![native-routes-gke](https://raw.githubusercontent.com/shawnh2/shawnh2.github.io/master/_posts/img/2023-08-09/cilium-native-routes-gke.png)
 
-观察 Native-Routing 模式下的路由表，可以发现其每项都由一个 endpoint 组成。而对比 Cilium [默认模式下的路由表](https://shawnh2.github.io/2023/07/18/cilium-cni-walk-through.html#endpoint-%E8%B7%AF%E7%94%B1%E7%94%9F%E6%88%90)（`enable-local-node-route: true`），可见其路由项绕过了`cilium_host`设备，转而是直接通过 endpoint 的接口路由。所以 Cilium 为此种情况下 endpoint 接口的 egress 方向也做了 BPF 程序的重载。
+观察 Native-Routing 模式下的路由表，可以发现其每项都由一个 endpoint 组成。而对比 Cilium [默认模式下的路由表](https://shawnh2.github.io/post/2023/07/18/cilium-cni-walk-through.html#endpoint-%E8%B7%AF%E7%94%B1%E7%94%9F%E6%88%90)（`enable-local-node-route: true`），可见其路由项绕过了`cilium_host`设备，转而是直接通过 endpoint 的接口路由。所以 Cilium 为此种情况下 endpoint 接口的 egress 方向也做了 BPF 程序的重载。
 
 ## 总结
 本文从 host endpoint 与 endpoint 两种类型的 BPF 程序重载展开分析，并鸟瞰了两种加载的 BPF 程序代码。虽然 tc ReloadDatapath 是 Cilium CNI 工作的其中一步，但是也存在很多值得探讨的地方。本文只是以微观、局部的视角对 tc 的工作展开了分析，并没有对 Cilium 宏观、整体的过程展开描述，着实由于作者水平有限，浅尝辄止。若分析有误、考虑不全，望批评指正。
 
 ## Reference
 
-1. [https://shawnh2.github.io/2023/07/18/cilium-cni-walk-through.html](https://shawnh2.github.io/2023/07/18/cilium-cni-walk-through.html)
+1. [https://shawnh2.github.io/post/2023/07/18/cilium-cni-walk-through.html](https://shawnh2.github.io/post/2023/07/18/cilium-cni-walk-through.html)
 2. [https://docs.cilium.io/en/stable/gettingstarted/terminology/#reserved-labels](https://docs.cilium.io/en/stable/gettingstarted/terminology/#reserved-labels)
 3. [https://docs.cilium.io/en/stable/network/ebpf/intro/](https://docs.cilium.io/en/stable/network/ebpf/intro/)
 4. [https://docs.cilium.io/en/latest/bpf/progtypes/#tc-traffic-control](https://docs.cilium.io/en/latest/bpf/progtypes/#tc-traffic-control)

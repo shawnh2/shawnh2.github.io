@@ -591,7 +591,7 @@ nf_nat_ipv4_fn(void *priv, struct sk_buff *skb,
 ```
 ## 应用
 ### kube-proxy with nft
-[之前的文章](https://shawnh2.github.io/2023/05/18/kube-proxy-walk-through.html)提到过，kpng 可以扩展 kube-proxy 的 proxier 实现，本文就以 kpng 实现的 nft backend 为例，分析一下 nft 模式下的 kube-proxy 该如何工作。
+[之前的文章](https://shawnh2.github.io/post/2023/05/18/kube-proxy-walk-through.html)提到过，kpng 可以扩展 kube-proxy 的 proxier 实现，本文就以 kpng 实现的 nft backend 为例，分析一下 nft 模式下的 kube-proxy 该如何工作。
 
 假设存在一个 Service，ClusterIP 为 10.96.0.1，端口为 443/TCP，其代理了一个 Endpoint，地址为 172.18.0.4:6443；在 kube-system 下，还存在 kube-dns 的 Service，其 ClusterIP 为 10.96.0.10，可用端口号有 53/UDP，53/TCP，9153/TCP。如下是 kpng nft backend 生成规则的 ip 表部分：
 
