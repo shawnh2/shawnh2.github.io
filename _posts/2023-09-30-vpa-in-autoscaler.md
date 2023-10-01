@@ -459,7 +459,7 @@ func (calc *UpdatePriorityCalculator) AddPod(pod *apiv1.Pod, now time.Time) {
 	updatePriority := calc.priorityProcessor.GetUpdatePriority(pod, calc.vpa, processedRecommendation)  // 计算更新的优先级
 
 	// 开始快速 OOM 的判断逻辑
-    quickOOM := false
+	quickOOM := false
 	for i := range pod.Status.ContainerStatuses {
 		cs := &pod.Status.ContainerStatuses[i]
 		if hasObservedContainers && !vpaContainerSet.Has(cs.Name) {  // 对于没有被 Admission Controller 观察到的容器，是不支持快速 OOM 判断的
