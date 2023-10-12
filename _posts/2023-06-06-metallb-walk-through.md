@@ -4,6 +4,7 @@ layout: article
 key: metallb
 tags:
 - Network
+- Kubernetes
 ---
 
 > 本文代码基于 [MetalLB v0.13.9](https://github.com/metallb/metallb/tree/v0.13.9) 展开。

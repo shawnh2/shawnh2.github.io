@@ -28,7 +28,7 @@ key: page-about
 
 ![cover](https://raw.githubusercontent.com/shawnh2/shawnh2.github.io/master/assets/about-cover.jpeg)
 
-shawn (sh2)，目前就读于杭州电子科技大学，计算机硕士。
+shawn(sh2)，目前是杭州电子科技大学的一名研究生。
 
 ### Working Experience
 
