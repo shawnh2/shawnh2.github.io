@@ -28,13 +28,23 @@ key: page-about
 
 ![cover](https://raw.githubusercontent.com/shawnh2/shawnh2.github.io/master/assets/about-cover.jpeg)
 
-shawn(sh2)，目前是杭州电子科技大学的一名研究生。
+Hi there, I'm shawn (aka. sh2).
 
 ### Working Experience
 
-- 2023/07-Now，杭州，Greptime，PaaS Infra Intern
-- 2023/02-2023/06，上海，七牛云，Test Infra Intern
+Internship:
+
+- 2023/07~2023/12, Hangzhou, [Greptime](https://www.greptime.com/), PaaS Infra Team
+- 2023/02~2023/06, Shanghai, [Qiniu](https://www.qiniu.com/), Test Infra Team
+
+### Open-source Experience
+
+- Member and Reviewer of [Envoy Gateway](https://github.com/envoyproxy/gateway)
+
+### Education Experience
+
+- 2021/09~2024/06, Hangzhou Dianzi University (HDU), _Computer Engineering_, Master degree
 
 ### Focus & Interests
 
-- Cloud Native Gateway and Network Proxy
+- Cloud Native API Gateway and Network Proxy
