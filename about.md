@@ -28,9 +28,13 @@ key: page-about
 
 ![cover](https://raw.githubusercontent.com/shawnh2/shawnh2.github.io/master/assets/about-cover.jpeg)
 
-Hi there, I'm shawn (aka. sh2).
+Hi there! I'm Shawn Hu (aka. sh2).
 
 ### Working Experience
+
+Full-time Job:
+
+- _still looking for one..._
 
 Internship:
 
@@ -41,9 +45,9 @@ Internship:
 
 - Member and Reviewer of [Envoy Gateway](https://github.com/envoyproxy/gateway)
 
-### Education Experience
+### Educational Experience
 
-- 2021/09~2024/06, Hangzhou Dianzi University (HDU), _Computer Engineering_, Master degree
+- 2021/09~2024/06, [Hangzhou Dianzi University](https://www.hdu.edu.cn/main.htm) (HDU), _Computer Engineering and Technology_, Master's degree
 
 ### Focus & Interests
 
