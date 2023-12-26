@@ -32,10 +32,6 @@ Hi there! I'm Shawn Hu (aka. sh2).
 
 ### Working Experience
 
-Full-time Job:
-
-- _still looking for one..._
-
 Internship:
 
 - 2023/07~2023/12, Hangzhou, [Greptime](https://www.greptime.com/), PaaS Infra Team
@@ -47,7 +43,7 @@ Internship:
 
 ### Educational Experience
 
-- 2021/09~2024/06, [Hangzhou Dianzi University](https://www.hdu.edu.cn/main.htm) (HDU), _Computer Engineering and Technology_, Master's degree
+- 2021/09~2024/06, [Hangzhou Dianzi University](https://www.hdu.edu.cn/main.htm), _Computer Technology_, Master's degree
 
 ### Focus & Interests
 
