@@ -28,9 +28,13 @@ key: page-about
 
 ![cover](https://raw.githubusercontent.com/shawnh2/shawnh2.github.io/master/assets/about-cover.jpeg)
 
-Hi there! I'm Shawn Hu (aka. sh2).
+Hi there! I'm Shawn Hu (aka. sh2). A Gopher, Open Source Enthusiast and Cloud Native Fan.
 
 ### Working Experience
+
+Full-time:
+
+- 2024/07~Now, Shanghai, Huawei Cloud
 
 Internship:
 
