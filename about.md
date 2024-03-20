@@ -28,27 +28,29 @@ key: page-about
 
 ![cover](https://raw.githubusercontent.com/shawnh2/shawnh2.github.io/master/assets/about-cover.jpeg)
 
-Hi there! I'm Shawn Hu (aka. sh2). A Gopher, Open Source Enthusiast and Cloud Native Fan.
+Hi there! I'm Shawn Hu (aka. sh2).
 
-### Working Experience
+A Gopher, Open Source Enthusiast and Cloud Native Fan.
 
-Full-time:
+## Working Experience
 
-- 2024/07~Now, Shanghai, Huawei Cloud
+### Industry
 
-Internship:
+- 2024/07~Now, Shanghai, [HuaweiCloud](https://www.huaweicloud.com/)
+
+### Internship
 
 - 2023/07~2023/12, Hangzhou, [Greptime](https://www.greptime.com/), PaaS Infra Team
 - 2023/02~2023/06, Shanghai, [Qiniu](https://www.qiniu.com/), Test Infra Team
 
-### Open-source Experience
+## Open-source Experience
 
 - Member and Reviewer of [Envoy Gateway](https://github.com/envoyproxy/gateway)
 
-### Educational Experience
+## Educational Experience
 
 - 2021/09~2024/06, [Hangzhou Dianzi University](https://www.hdu.edu.cn/main.htm), _Computer Technology_, Master's degree
 
-### Focus & Interests
+## Focus & Interests
 
 - Cloud Native API Gateway and Network Proxy
