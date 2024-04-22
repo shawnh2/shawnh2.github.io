@@ -34,14 +34,15 @@ A Gopher, Open Source Enthusiast and Cloud Native Fan.
 
 ## Working Experience
 
-### Industry
+### Industrial
 
-- 2024/07~Now, Shanghai, [HuaweiCloud](https://www.huaweicloud.com/)
+- `2024/07~Now`, [Huawei Cloud](https://www.huaweicloud.com/), Shanghai
 
 ### Internship
 
-- 2023/07~2023/12, Hangzhou, [Greptime](https://www.greptime.com/), PaaS Infra Team
-- 2023/02~2023/06, Shanghai, [Qiniu](https://www.qiniu.com/), Test Infra Team
+- `2024/05~2024/07`, [Tetrate.io](https://tetrate.io/), Remote, TEG Open-source Team
+- `2023/07~2023/12`, [Greptime](https://www.greptime.com/), Hangzhou, PaaS Infra Team
+- `2023/02~2023/06`, [Qiniu](https://www.qiniu.com/), Shanghai, Test Infra Team
 
 ## Open-source Experience
 
@@ -49,8 +50,8 @@ A Gopher, Open Source Enthusiast and Cloud Native Fan.
 
 ## Educational Experience
 
-- 2021/09~2024/06, [Hangzhou Dianzi University](https://www.hdu.edu.cn/main.htm), _Computer Technology_, Master's degree
+- `2021/09~2024/06`, [Hangzhou Dianzi University](https://www.hdu.edu.cn/main.htm), Computer Technology, Master's degree
 
 ## Focus & Interests
 
-- Cloud Native API Gateway and Network Proxy
+- Cloud Native API Gateway, Network Proxy and Service Mesh
