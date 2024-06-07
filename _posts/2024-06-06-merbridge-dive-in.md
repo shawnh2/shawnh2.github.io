@@ -16,17 +16,17 @@ Merbridge 是基于 eBPF 实现的一套可用于服务网格中流量拦截与�
 
 具体来讲（以 Istio Sidecar 模式为例），下图为原始流量路径：
 
-![istio-sidecar-traffic.png](https://raw.githubusercontent.com/shawnh2/shawnh2.github.io/master/_posts/img/2023-06-06/istio-sidecar-traffic.png)
+![istio-sidecar-traffic.png](https://raw.githubusercontent.com/shawnh2/shawnh2.github.io/master/_posts/img/2024-06-06/istio-sidecar-traffic.png)
 
 <!--more-->
 
 在使用 Merbridge 后，可有效减少业务数据包与内核网络交互的次数，服务间的网络数据路径就只剩下代理之间的了。
 
-![merbridge-traffic.png](https://raw.githubusercontent.com/shawnh2/shawnh2.github.io/master/_posts/img/2023-06-06/merbridge-traffic.png)
+![merbridge-traffic.png](https://raw.githubusercontent.com/shawnh2/shawnh2.github.io/master/_posts/img/2024-06-06/merbridge-traffic.png)
 
 甚至，若两个 Pod 位于同一个 Node 之上，它们之间的网络数据路径还能更加简洁。
 
-![merbridge-traffic-same-node.png](https://raw.githubusercontent.com/shawnh2/shawnh2.github.io/master/_posts/img/2023-06-06/merbridge-traffic-same-node.png)
+![merbridge-traffic-same-node.png](https://raw.githubusercontent.com/shawnh2/shawnh2.github.io/master/_posts/img/2024-06-06/merbridge-traffic-same-node.png)
 
 ## 组成
 
@@ -105,7 +105,7 @@ Istio 使用 iptables 的 DNAT 功能做流量转发，Merbridge 则使用 eBPF 
 
 本节以 TCP 连接为例，介绍从应用容器（App）到 Sidecar Envoy 的 15001 端口连接建立的过程。
 
-![merbridge-outbound.png](https://raw.githubusercontent.com/shawnh2/shawnh2.github.io/master/_posts/img/2023-06-06/merbridge-outbound.png)
+![merbridge-outbound.png](https://raw.githubusercontent.com/shawnh2/shawnh2.github.io/master/_posts/img/2024-06-06/merbridge-outbound.png)
 
 对于从应用容器的出口流量，需要将其重定向到 Sidecar Envoy 的 15001 端口（即 `127.0.0.1:15001`）。
 
@@ -300,7 +300,7 @@ __section("sk_msg") int mb_msg_redir(struct sk_msg_md *msg)
 
 入口流量的处理与出口流量类似，只需将目的地址的端口改为 15006 即可。
 
-![merbridge-inbound.png](https://raw.githubusercontent.com/shawnh2/shawnh2.github.io/master/_posts/img/2023-06-06/merbridge-inbound.png)
+![merbridge-inbound.png](https://raw.githubusercontent.com/shawnh2/shawnh2.github.io/master/_posts/img/2024-06-06/merbridge-inbound.png)
 
 由于 eBPF 程序全局生效，对于不为 Istio 所管理的 Pod，就不允许外部流量向其建立连接。所以 Merbridge 维护了一个 `local_pod_ips` 的 map（通过 Local IP Controller 更新）。当 Merbridge 在做入口流量处理时，若目的地址不在该 map 中，则不做任何处理。
 
