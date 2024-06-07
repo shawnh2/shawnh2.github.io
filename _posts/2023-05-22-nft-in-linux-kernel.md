@@ -4,7 +4,7 @@ layout: article
 key: nftables
 tags:
 - Network
-- Linux Kernel
+- Linux
 ---
 
 > 本文代码基于 [Linux Kernel v4.10](https://elixir.bootlin.com/linux/v4.10/source) 展开。
