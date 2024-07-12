@@ -36,7 +36,7 @@ A Gopher, Open Source Enthusiast and Cloud Native Fan.
 
 ### Industrial
 
-- 2024/07~Now, [Huawei Cloud](https://www.huaweicloud.com/), Shanghai
+- 2024/08~Now, [Huawei Cloud](https://www.huaweicloud.com/), Shanghai
 
 ### Internship
 
@@ -46,7 +46,7 @@ A Gopher, Open Source Enthusiast and Cloud Native Fan.
 
 ## Open-source Experience
 
-- Member and Reviewer of [Envoy Gateway](https://github.com/envoyproxy/gateway)
+- Member of [EnvoyProxy](https://github.com/envoyproxy) and Maintainer of [Envoy Gateway](https://github.com/envoyproxy/gateway)
 
 ## Educational Experience
 
@@ -55,3 +55,4 @@ A Gopher, Open Source Enthusiast and Cloud Native Fan.
 ## Focus & Interests
 
 - Cloud Native API Gateway, Network Proxy and Service Mesh
+- eBPF and Linux kernel network
